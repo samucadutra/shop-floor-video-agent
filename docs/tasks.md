@@ -328,10 +328,10 @@ make lint
 
 **Goal:** a reviewer can understand, run and evaluate the project from the README alone.
 
-- [ ] **11.1** README: what it is (2–3 lines), screenshots (upload, detail with trace, dashboard), quick start (`cp .env.example .env`, `make samples`, `docker compose up`), providers (mock/Gemini, free tier notes, privacy warning), sample videos with links and creator credits (PRD Appendix A), architecture Mermaid diagram (PRD §10), agent loop diagram (S6.3), commands, kind, CI, limitations, and what production would add (PRD §3).
-- [ ] **11.2** `docs/demo.md`: a 3-minute demo script (upload sample 1, follow the trace, open the control clip, show the dashboard).
-- [ ] **11.3** Run all 4 sample clips with the mock and with Gemini. Record the results against PRD Appendix A in `docs/demo.md`.
-- [ ] **11.4** Final check against the PRD §14 success criteria. Every item is ticked or has a note.
+- [x] **11.1** README: what it is (2–3 lines), screenshots (upload, detail with trace, dashboard), quick start (`cp .env.example .env`, `make samples`, `docker compose up`), providers (mock/Gemini, free tier notes, privacy warning), sample videos with links and creator credits (PRD Appendix A), architecture Mermaid diagram (PRD §10), agent loop diagram (S6.3), commands, kind, CI, limitations, and what production would add (PRD §3).
+- [x] **11.2** `docs/demo.md`: a 3-minute demo script (upload sample 1, follow the trace, open the control clip, show the dashboard).
+- [ ] **11.3** Run all 4 sample clips with the mock and with Gemini. Record the results against PRD Appendix A in `docs/demo.md`. **Mock: done. Gemini: blocked by the free tier daily quota on 2026-10-14; rerun pending (see `docs/demo.md`).**
+- [x] **11.4** Final check against the PRD §14 success criteria. Every item is ticked or has a note.
 
 ### Verify
 

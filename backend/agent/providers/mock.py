@@ -94,6 +94,7 @@ def load_fixture(video_info: VideoInfo) -> MockFixture:
 class MockProvider(BaseProvider):
     name = "mock"
     model = ""
+    throttled = False
 
     def __init__(self, video_info: VideoInfo, latency_ms: int = 0) -> None:
         self.fixture = load_fixture(video_info)

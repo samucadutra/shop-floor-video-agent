@@ -9,7 +9,14 @@ from typing import Any, Literal
 from pydantic import BaseModel
 
 from agent.guardrails import BudgetExhausted, limit_hit
-from agent.providers.base import Frame, LLMOutputError, LLMRequest, Stage
+from agent.providers.base import (
+    Frame,
+    LLMOutputError,
+    LLMRequest,
+    QuotaExhaustedError,
+    RetryableLLMError,
+    Stage,
+)
 from agent.state import AgentDeps
 from media_tools.ffmpeg import ExtractedFrame, extract_scenes, extract_survey, extract_window
 
@@ -105,6 +112,9 @@ def analyze_frames[T: BaseModel](
     except LLMOutputError as exc:
         _add_usage(deps, exc.input_tokens, exc.output_tokens, calls=2)
         _log(deps, "analyze_frames", args, "invalid output after a retry")
+        raise
+    except (RetryableLLMError, QuotaExhaustedError) as exc:
+        _log(deps, "analyze_frames", args, f"failed: {exc}")
         raise
 
     _add_usage(deps, result.input_tokens, result.output_tokens, calls=result.attempts)

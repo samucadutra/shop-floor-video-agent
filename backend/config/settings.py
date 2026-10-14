@@ -81,6 +81,11 @@ CELERY_WORKER_PREFETCH_MULTIPLIER = 1
 # LLM provider. The model name only comes from env (<PROVIDER>_MODEL, e.g. GEMINI_MODEL).
 LLM_PROVIDER = env("LLM_PROVIDER", default="gemini")
 LLM_MODEL = env(f"{LLM_PROVIDER.upper()}_MODEL", default="")
+GEMINI_API_KEY = env("GEMINI_API_KEY", default="")
+GEMINI_MODEL = env("GEMINI_MODEL", default="")
+LLM_TIMEOUT_SECONDS = env.float("LLM_TIMEOUT_SECONDS", default=60)
+LLM_MAX_RETRIES = env.int("LLM_MAX_RETRIES", default=3)
+LLM_MAX_REQUESTS_PER_MINUTE = env.int("LLM_MAX_REQUESTS_PER_MINUTE", default=8)
 
 # Analysis run and frame extraction (spec S5, S6.4, S9).
 AGENT_RUN_TIMEOUT_SECONDS = env.int("AGENT_RUN_TIMEOUT_SECONDS", default=600)

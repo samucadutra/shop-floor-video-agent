@@ -9,7 +9,10 @@ import yaml
 from django.core.files.uploadedfile import SimpleUploadedFile
 from rest_framework.test import APIClient
 
+from agent import runner
 from agent.providers import mock
+from agent.providers.base import LLMRequest, QuotaExhaustedError, RawResponse, RetryableLLMError
+from agent.providers.gemini import QUOTA_MESSAGE
 from videos.models import AgentStep, AnalysisRun, Event, Video
 
 pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("celery_eager")]
@@ -92,6 +95,34 @@ def limits(settings) -> Callable[..., None]:
         settings.AGENT = dataclasses.replace(settings.AGENT, **changes)
 
     return _set
+
+
+class FailingProvider(mock.MockProvider):
+    """The mock, but calls for `stage` raise `error` (as a real provider would)."""
+
+    name = "fake"
+    throttled = True
+
+    def __init__(self, video_info, stage: str, error: Exception) -> None:
+        super().__init__(video_info)
+        self.stage, self.error = stage, error
+
+    def complete(self, request: LLMRequest, extra_instruction: str | None = None) -> RawResponse:
+        if request.stage == self.stage:
+            raise self.error
+        return super().complete(request, extra_instruction)
+
+
+@pytest.fixture
+def failing_provider(monkeypatch: pytest.MonkeyPatch, settings) -> Callable[[str, Exception], None]:
+    settings.LLM_MAX_RETRIES = 0  # backoff itself is tested in test_client.py
+
+    def _use(stage: str, error: Exception) -> None:
+        monkeypatch.setattr(
+            runner, "build_provider", lambda _s, info: FailingProvider(info, stage, error)
+        )
+
+    return _use
 
 
 def _steps(run: AnalysisRun) -> list[AgentStep]:
@@ -253,3 +284,55 @@ def test_reanalysis_does_not_duplicate_events(video: Video, analyze) -> None:
     assert video.current_run_id == second.id
     assert AnalysisRun.objects.filter(video=video).count() == 1
     assert Event.objects.filter(video=video).count() == 2
+
+
+def test_quota_error_fails_the_run_with_a_clear_message(
+    video: Video, analyze, failing_provider
+) -> None:
+    failing_provider("inspect", QuotaExhaustedError(QUOTA_MESSAGE))
+
+    run = analyze(video)
+
+    run.refresh_from_db()
+    video.refresh_from_db()
+    assert (run.status, run.stop_reason, video.status) == ("failed", "error", "failed")
+    assert run.error_message == QUOTA_MESSAGE
+    assert "daily quota" in video_detail_error(video)
+
+
+def test_provider_down_after_retries_fails_the_survey(
+    video: Video, analyze, failing_provider
+) -> None:
+    failing_provider("survey", RetryableLLMError("Gemini returned HTTP 503"))
+
+    run = analyze(video)
+
+    run.refresh_from_db()
+    assert (run.status, run.stop_reason) == ("failed", "error")
+    assert run.error_message == (
+        "The survey step failed: the LLM provider did not answer after several retries."
+    )
+    [step] = _steps(run)
+    assert (step.node, step.status, step.error_message) == (
+        "survey",
+        "error",
+        "Gemini returned HTTP 503",
+    )
+
+
+def test_provider_down_during_inspect_drops_candidates_and_continues(
+    video: Video, analyze, failing_provider
+) -> None:
+    failing_provider("inspect", RetryableLLMError("Gemini request timed out"))
+
+    run = analyze(video)
+
+    run.refresh_from_db()
+    assert run.status == "succeeded"
+    inspects = [s for s in _steps(run) if s.node == "inspect"]
+    assert inspects and all(s.status == "error" for s in inspects)
+    assert "analysis failed" in inspects[0].decision
+
+
+def video_detail_error(video: Video) -> str:
+    return APIClient().get(f"/api/videos/{video.id}/").json()["error_message"]

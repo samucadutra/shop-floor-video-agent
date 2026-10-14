@@ -148,11 +148,11 @@ curl -fsS http://localhost:8000/api/videos/$VID/events/ | python3 -c 'import sys
 
 **Goal:** the same agent works with Gemini on the free tier, with throttling and retries. The other providers are optional.
 
-- [ ] **5.1** In `LLMClient`: the sliding window throttle (`LLM_MAX_REQUESTS_PER_MINUTE`), `tenacity` backoff on `RetryableLLMError`, timeouts, and no retry on `QuotaExhaustedError` (S7.2).
-- [ ] **5.2** `agent/providers/gemini.py` (S7.3): images as JPEG parts, JSON response type, usage, and error mapping.
-- [ ] **5.3** Fail fast in the factory when the selected provider's env is missing (the message names the variable only).
-- [ ] **5.4** Tests with a fake provider (no network): backoff on 429 and 503 (the wait patched to 0), no retry on 400, a quota error fails the run with a clear message, the throttle waits once over the limit (fake clock), cost math, and Gemini error mapping using fake SDK exceptions.
-- [ ] **5.5** Update `.env.example` (`GEMINI_API_KEY`, `GEMINI_MODEL`, prices).
+- [x] **5.1** In `LLMClient`: the sliding window throttle (`LLM_MAX_REQUESTS_PER_MINUTE`), `tenacity` backoff on `RetryableLLMError`, timeouts, and no retry on `QuotaExhaustedError` (S7.2).
+- [x] **5.2** `agent/providers/gemini.py` (S7.3): images as JPEG parts, JSON response type, usage, and error mapping.
+- [x] **5.3** Fail fast in the factory when the selected provider's env is missing (the message names the variable only).
+- [x] **5.4** Tests with a fake provider (no network): backoff on 429 and 503 (the wait patched to 0), no retry on 400, a quota error fails the run with a clear message, the throttle waits once over the limit (fake clock), cost math, and Gemini error mapping using fake SDK exceptions.
+- [x] **5.5** Update `.env.example` (`GEMINI_API_KEY`, `GEMINI_MODEL`, prices).
 - [ ] **5.6** Manual run with Gemini on sample 1, then compare the events with PRD Appendix A.
 - [ ] **5.7** (optional) `agent/providers/anthropic.py` + tests with fake SDK errors.
 - [ ] **5.8** (optional) `agent/providers/openai.py` + tests with fake SDK errors.

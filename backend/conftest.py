@@ -20,6 +20,7 @@ def mock_llm(settings) -> None:
     settings.LLM_PROVIDER = "mock"
     settings.LLM_MODEL = ""
     settings.MOCK_LATENCY_MS = 0
+    settings.LLM_MAX_REQUESTS_PER_MINUTE = 0  # no throttle waits in tests
 
 
 @pytest.fixture

@@ -10,11 +10,13 @@ from typing import Any
 
 from agent import prompts, tools
 from agent.guardrails import BudgetExhausted, budget_exceeded
-from agent.providers.base import LLMOutputError
+from agent.providers.base import LLMOutputError, RetryableLLMError
 from agent.schemas import InspectResult, ReportResult, SurveyResult, VerifyResult
 from agent.state import AgentDeps, AgentState, CandidateState, Window
 
 SEVERITY_RANK = {"low": 0, "medium": 1, "high": 2}
+# LLM failures that end a step: invalid output after the retry, or no answer after the backoff.
+STEP_ERRORS = (LLMOutputError, RetryableLLMError)
 
 
 class AgentFailed(Exception):
@@ -65,6 +67,12 @@ def _ref(deps: AgentDeps, path: Path) -> str:
         return path.name
 
 
+def _why(exc: Exception) -> str:
+    if isinstance(exc, RetryableLLMError):
+        return "the LLM provider did not answer after several retries"
+    return "the model returned invalid output"
+
+
 def _brief(candidate: CandidateState) -> dict[str, Any]:
     keys = ("id", "event_type", "time_s", "reason")
     return {k: candidate[k] for k in keys}
@@ -103,9 +111,9 @@ def survey(state: AgentState, deps: AgentDeps) -> dict[str, Any]:
             result = tools.analyze_frames(
                 deps, batch, prompt, stage="survey", schema=SurveyResult, payload=payload
             )
-        except LLMOutputError as exc:
+        except STEP_ERRORS as exc:
             _record(deps, "survey", 0, input_summary, "survey failed", started, error=str(exc))
-            raise AgentFailed("The survey step failed: the model returned invalid output.") from exc
+            raise AgentFailed(f"The survey step failed: {_why(exc)}.") from exc
         except BudgetExhausted as exc:
             updates = _stop(state, exc.reason)
             ignored.append(f"remaining batches skipped ({exc.reason})")
@@ -278,7 +286,7 @@ def inspect(state: AgentState, deps: AgentDeps) -> dict[str, Any]:
                 error=f"Budget limit reached: {exc.reason}",
             )
             break
-        except LLMOutputError as exc:
+        except STEP_ERRORS as exc:
             lines = []
             for c in members:
                 c["looks"] += 1
@@ -360,7 +368,7 @@ def verify(state: AgentState, deps: AgentDeps) -> dict[str, Any]:
             updates = _stop(state, exc.reason)
             error = f"Budget limit reached: {exc.reason}"
             lines.append(f"not verified ({exc.reason})")
-        except LLMOutputError as exc:
+        except STEP_ERRORS as exc:
             error = str(exc)
             lines.extend(_drop(c, "verification failed") for c in targets.values())
         else:
@@ -457,7 +465,7 @@ def report(state: AgentState, deps: AgentDeps) -> dict[str, Any]:
             deps, [], prompt, stage="report", schema=ReportResult, payload=payload
         )
         summary = result.summary
-    except LLMOutputError as exc:
+    except STEP_ERRORS as exc:
         _record(
             deps,
             "report",
@@ -467,7 +475,7 @@ def report(state: AgentState, deps: AgentDeps) -> dict[str, Any]:
             started,
             error=str(exc),
         )
-        raise AgentFailed("The report step failed: the model returned invalid output.") from exc
+        raise AgentFailed(f"The report step failed: {_why(exc)}.") from exc
     except BudgetExhausted as exc:
         stop_reason, is_partial = stop_reason or exc.reason, True
         error = f"Budget limit reached: {exc.reason}"

@@ -8,6 +8,7 @@ from agent import repository
 from agent.event_types import load_event_types
 from agent.graph import RECURSION_LIMIT, build_graph
 from agent.nodes import AgentFailed
+from agent.providers.base import QuotaExhaustedError
 from agent.providers.client import LLMClient
 from agent.providers.factory import ProviderConfigError, VideoInfo, build_provider
 from agent.state import AgentDeps, AgentParams, AgentState, new_budget
@@ -75,7 +76,10 @@ def run_agent(run_id: str, settings: Any) -> AgentOutcome:
         stop_reason=None,
         summary="",
     )
-    final = build_graph(deps).invoke(initial, config={"recursion_limit": RECURSION_LIMIT})
+    try:
+        final = build_graph(deps).invoke(initial, config={"recursion_limit": RECURSION_LIMIT})
+    except QuotaExhaustedError as exc:
+        raise AgentFailed(str(exc)) from exc  # the provider's message is user-safe
     budget = final["budget"]
     return AgentOutcome(
         summary=final["summary"],

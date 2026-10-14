@@ -65,7 +65,15 @@ class LLMOutputError(Exception):
 class BaseProvider(ABC):
     name: str
     model: str
+    throttled: bool = True  # False for providers with no rate limit (the mock)
 
     @abstractmethod
     def complete(self, request: LLMRequest, extra_instruction: str | None = None) -> RawResponse:
         """Send the request to the model and return its raw text and token usage."""
+
+
+def prompt_text(request: LLMRequest, extra_instruction: str | None) -> str:
+    """The prompt, with the validation retry instruction appended when there is one."""
+    if not extra_instruction:
+        return request.prompt
+    return f"{request.prompt}\n\n{extra_instruction}"

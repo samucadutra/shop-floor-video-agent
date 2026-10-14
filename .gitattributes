@@ -1,0 +1,6 @@
+# Always check out text files with LF, even with core.autocrlf=true,
+# so shell scripts, the Makefile and Dockerfiles work in a fresh clone.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.mp4 binary

@@ -1,11 +1,13 @@
 """The LangGraph state graph (docs/spec.md S6.3, S6.5)."""
 
+from collections.abc import Callable
 from typing import Any
 
 from langgraph.graph import END, START, StateGraph
 
 from agent import nodes
 from agent.state import AgentDeps, AgentState
+from config.logging import log_context
 
 RECURSION_LIMIT = 50
 
@@ -23,14 +25,21 @@ def after_verify(state: AgentState) -> str:
     return "report"
 
 
+def _bind(name: str, node: Callable[[AgentState, AgentDeps], dict], deps: AgentDeps) -> Callable:
+    """Bind the node to `deps`; its log lines carry the node name."""
+
+    def run(state: AgentState) -> dict[str, Any]:
+        with log_context(node=name):
+            return node(state, deps)
+
+    return run
+
+
 def build_graph(deps: AgentDeps) -> Any:
     """Compile the graph with the nodes bound to `deps`."""
     g = StateGraph(AgentState)
-    g.add_node("survey", lambda s: nodes.survey(s, deps))
-    g.add_node("plan", lambda s: nodes.plan(s, deps))
-    g.add_node("inspect", lambda s: nodes.inspect(s, deps))
-    g.add_node("verify", lambda s: nodes.verify(s, deps))
-    g.add_node("report", lambda s: nodes.report(s, deps))
+    for name in ("survey", "plan", "inspect", "verify", "report"):
+        g.add_node(name, _bind(name, getattr(nodes, name), deps))
     g.add_edge(START, "survey")
     g.add_edge("survey", "plan")
     g.add_conditional_edges("plan", after_plan, {"inspect": "inspect", "report": "report"})

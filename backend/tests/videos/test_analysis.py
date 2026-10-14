@@ -13,7 +13,7 @@ from media_tools.ffmpeg import FFmpegError
 from tests.videos.factories import create_event, create_run, create_video
 from videos.models import AnalysisRun, Event, RunStatus, StopReason, Video, VideoStatus
 from videos.services import STALE_RUN_MESSAGE
-from videos.tasks import ERROR_MESSAGE
+from videos.tasks import ERROR_MESSAGE, FFMPEG_MESSAGE
 
 pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("celery_eager")]
 
@@ -91,8 +91,9 @@ def test_analyze_404(client: APIClient) -> None:
 @pytest.mark.parametrize(
     ("error", "reason", "message"),
     [
-        (FFmpegError("boom"), StopReason.ERROR, ERROR_MESSAGE),
-        (SoftTimeLimitExceeded(), StopReason.TIMEOUT, "The analysis took longer than"),
+        (FFmpegError("boom"), StopReason.ERROR, FFMPEG_MESSAGE),
+        (RuntimeError("boom"), StopReason.ERROR, ERROR_MESSAGE),
+        (SoftTimeLimitExceeded(), StopReason.TIMEOUT, "The analysis took longer than the"),
     ],
 )
 def test_failure_sets_failed_and_keeps_current_run(

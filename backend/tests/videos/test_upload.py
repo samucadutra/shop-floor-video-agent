@@ -84,6 +84,25 @@ def test_too_large_is_rejected(make_test_video, settings) -> None:
 
 
 @pytest.mark.django_db
+def test_real_201_mb_file_is_rejected_by_the_server(
+    tmp_path: Path, media_root: Path, settings
+) -> None:
+    """The server enforces the 200 MB default even when the browser check is skipped."""
+    settings.MAX_UPLOAD_BYTES = 200 * 1024 * 1024
+    big = tmp_path / "big.mp4"
+    with big.open("wb") as f:
+        f.truncate(201 * 1024 * 1024)  # sparse: no disk space used
+
+    with big.open("rb") as f:
+        response = APIClient().post("/api/videos/", {"file": f}, format="multipart")
+
+    assert response.status_code == 400
+    assert "too large" in _error(response)
+    assert Video.objects.count() == 0
+    assert not list(media_root.rglob("*.mp4"))
+
+
+@pytest.mark.django_db
 def test_too_long_is_rejected(make_test_video, settings) -> None:
     settings.MAX_VIDEO_SECONDS = 2
 

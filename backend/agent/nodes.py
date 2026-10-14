@@ -67,10 +67,17 @@ def _ref(deps: AgentDeps, path: Path) -> str:
         return path.name
 
 
-def _why(exc: Exception) -> str:
+def _failure(stage: str, exc: Exception) -> str:
+    """User-facing message for a survey or report failure that ends the run."""
     if isinstance(exc, RetryableLLMError):
-        return "the LLM provider did not answer after several retries"
-    return "the model returned invalid output"
+        return (
+            f"The LLM provider did not answer during the {stage} step, even after several "
+            "retries. Check the provider status and retry later."
+        )
+    return (
+        f"The model returned invalid output twice during the {stage} step. Retry the "
+        "analysis; if it keeps failing, try another model."
+    )
 
 
 def _brief(candidate: CandidateState) -> dict[str, Any]:
@@ -113,7 +120,7 @@ def survey(state: AgentState, deps: AgentDeps) -> dict[str, Any]:
             )
         except STEP_ERRORS as exc:
             _record(deps, "survey", 0, input_summary, "survey failed", started, error=str(exc))
-            raise AgentFailed(f"The survey step failed: {_why(exc)}.") from exc
+            raise AgentFailed(_failure("survey", exc)) from exc
         except BudgetExhausted as exc:
             updates = _stop(state, exc.reason)
             ignored.append(f"remaining batches skipped ({exc.reason})")
@@ -475,7 +482,7 @@ def report(state: AgentState, deps: AgentDeps) -> dict[str, Any]:
             started,
             error=str(exc),
         )
-        raise AgentFailed(f"The report step failed: {_why(exc)}.") from exc
+        raise AgentFailed(_failure("report", exc)) from exc
     except BudgetExhausted as exc:
         stop_reason, is_partial = stop_reason or exc.reason, True
         error = f"Budget limit reached: {exc.reason}"

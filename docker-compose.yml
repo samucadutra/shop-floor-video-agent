@@ -50,6 +50,8 @@ services:
       - "8000:8000"
     volumes:
       - media:/app/media
+      # Read by the test that keeps .env.example in sync with settings.ENV_VARS.
+      - ./.env.example:/app/.env.example:ro
     depends_on:
       postgres:
         condition: service_healthy

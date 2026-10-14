@@ -9,7 +9,14 @@ from django.conf import settings
 from django.core.exceptions import SuspiciousFileOperation
 from django.db import connection
 from django.db.models import Avg, Count, F, Q, Sum
-from django.http import FileResponse, Http404, HttpRequest, HttpResponse, StreamingHttpResponse
+from django.http import (
+    FileResponse,
+    Http404,
+    HttpRequest,
+    HttpResponse,
+    JsonResponse,
+    StreamingHttpResponse,
+)
 from django.utils._os import safe_join
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -160,3 +167,13 @@ def serve_media(request: HttpRequest, path: str) -> HttpResponse:
     response["Content-Range"] = f"bytes {start}-{end}/{size}"
     response["Accept-Ranges"] = "bytes"
     return response
+
+
+def not_found(request: HttpRequest, exception: Exception) -> JsonResponse:
+    """handler404: a short JSON body instead of Django's HTML page (used when DEBUG is off)."""
+    return JsonResponse({"detail": "Not found."}, status=404)
+
+
+def server_error(request: HttpRequest) -> JsonResponse:
+    """handler500: no stack trace or settings in the response; the error is in the logs."""
+    return JsonResponse({"detail": "Internal server error."}, status=500)

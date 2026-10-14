@@ -114,7 +114,11 @@ export default function VideoDetailPage({ params }: PageProps<"/videos/[id]">) {
       {actionError && <ErrorState message={actionError} />}
       {video.status === "failed" && video.error_message && (
         <ErrorState
-          message={`The last analysis failed: ${video.error_message}`}
+          message={
+            run
+              ? `The last analysis failed: ${video.error_message} The results below are from the previous successful run.`
+              : `The analysis failed: ${video.error_message}`
+          }
           onRetry={starting ? undefined : analyze}
         />
       )}

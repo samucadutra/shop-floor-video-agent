@@ -2,7 +2,7 @@ import logging
 import os
 
 from celery import Celery
-from celery.signals import worker_init
+from celery.signals import setup_logging, worker_init
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 
@@ -11,6 +11,16 @@ app.config_from_object("django.conf:settings", namespace="CELERY")
 app.autodiscover_tasks()
 
 logger = logging.getLogger(__name__)
+
+
+@setup_logging.connect
+def use_django_logging(**_: object) -> None:
+    """Keep Celery from replacing the root logger: the worker logs JSON like Django (S16)."""
+    from logging.config import dictConfig
+
+    from django.conf import settings
+
+    dictConfig(settings.LOGGING)
 
 
 @worker_init.connect

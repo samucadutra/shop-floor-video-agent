@@ -5,6 +5,7 @@ from pathlib import Path
 import environ
 
 from agent.guardrails import AgentLimits
+from config.logging import logging_config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -113,9 +114,48 @@ AGENT = AgentLimits(
 
 LOG_LEVEL = env("LOG_LEVEL", default="INFO")
 
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "handlers": {"console": {"class": "logging.StreamHandler"}},
-    "root": {"handlers": ["console"], "level": LOG_LEVEL},
-}
+# JSON logs on stdout with context and secret redaction (spec S16). Celery uses it too.
+LOGGING = logging_config(LOG_LEVEL)
+
+# Every variable documented in .env.example (spec S14). A test keeps the two lists equal.
+ENV_VARS = [
+    "DJANGO_SECRET_KEY",
+    "DJANGO_DEBUG",
+    "DJANGO_ALLOWED_HOSTS",
+    "DATABASE_URL",
+    "POSTGRES_DB",
+    "POSTGRES_USER",
+    "POSTGRES_PASSWORD",
+    "REDIS_URL",
+    "CORS_ALLOWED_ORIGINS",
+    "MEDIA_ROOT",
+    "LOG_LEVEL",
+    "MAX_UPLOAD_MB",
+    "MAX_VIDEO_SECONDS",
+    "EVENT_TYPES_FILE",
+    "LLM_PROVIDER",
+    "GEMINI_API_KEY",
+    "GEMINI_MODEL",
+    "LLM_INPUT_PRICE_PER_MTOK",
+    "LLM_OUTPUT_PRICE_PER_MTOK",
+    "LLM_TIMEOUT_SECONDS",
+    "LLM_MAX_RETRIES",
+    "LLM_MAX_REQUESTS_PER_MINUTE",
+    "AGENT_MAX_ITERATIONS",
+    "AGENT_MAX_FRAMES",
+    "AGENT_MAX_TOKENS",
+    "AGENT_MAX_COST_USD",
+    "AGENT_MAX_LLM_CALLS",
+    "AGENT_REPORT_RESERVE_TOKENS",
+    "AGENT_RUN_TIMEOUT_SECONDS",
+    "SURVEY_INTERVAL_S",
+    "SCENE_THRESHOLD",
+    "INSPECT_FPS",
+    "WINDOW_PADDING_S",
+    "FRAMES_PER_CALL",
+    "FRAME_MAX_SIDE",
+    "CONFIDENCE_THRESHOLD",
+    "MOCK_LATENCY_MS",
+    "NEXT_PUBLIC_API_URL",
+    "NEXT_PUBLIC_MAX_UPLOAD_MB",
+]

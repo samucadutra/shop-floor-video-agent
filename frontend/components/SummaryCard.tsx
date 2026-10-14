@@ -1,3 +1,4 @@
+import { stopReasonLabel } from "@/lib/format";
 import type { Run } from "@/lib/types";
 
 export default function SummaryCard({ run }: { run: Run }) {
@@ -6,7 +7,8 @@ export default function SummaryCard({ run }: { run: Run }) {
       <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">Summary</h2>
       {run.is_partial && (
         <p className="mt-2 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-900">
-          Partial result: {run.stop_reason.replace(/_/g, " ")}
+          Partial result: {stopReasonLabel(run.stop_reason)}. Some moments may not have been
+          checked.
         </p>
       )}
       <p className="mt-2 whitespace-pre-line text-zinc-800">{run.summary || "No summary."}</p>

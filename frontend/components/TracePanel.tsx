@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { usePolling } from "@/hooks/usePolling";
 import { ApiError, getTrace } from "@/lib/api";
+import { stopReasonLabel } from "@/lib/format";
 import type { RunTrace } from "@/lib/types";
 import EmptyState from "./EmptyState";
 import ErrorState from "./ErrorState";
@@ -59,7 +60,7 @@ export default function TracePanel({ runId, live }: { runId: string | null; live
         <>
           {current.is_partial && (
             <p className="rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-900">
-              Stopped early by a guardrail: {current.stop_reason.replace(/_/g, " ")}. The report is
+              Stopped early by a guardrail: {stopReasonLabel(current.stop_reason)}. The report is
               partial.
             </p>
           )}

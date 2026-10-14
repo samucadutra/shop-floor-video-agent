@@ -38,3 +38,19 @@ export function formatDate(iso: string): string {
 export function formatNumber(value: number): string {
   return value.toLocaleString("en-US");
 }
+
+const STOP_REASONS: Record<string, string> = {
+  completed: "completed",
+  max_iterations: "the agent reached its maximum number of inspection rounds",
+  max_frames: "the frame limit for one run was reached",
+  max_tokens: "the token limit for one run was reached",
+  max_cost: "the cost limit for one run was reached",
+  max_llm_calls: "the limit on LLM calls per run was reached",
+  timeout: "the run took too long",
+  error: "an error stopped the run",
+};
+
+/** "max_llm_calls" -> "the limit on LLM calls per run was reached" */
+export function stopReasonLabel(reason: string): string {
+  return STOP_REASONS[reason] ?? reason.replace(/_/g, " ");
+}

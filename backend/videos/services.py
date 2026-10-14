@@ -17,7 +17,9 @@ from videos.models import (
     VideoStatus,
 )
 
-STALE_RUN_MESSAGE = "Worker stopped before finishing"
+STALE_RUN_MESSAGE = (
+    "Worker stopped before finishing (it may have crashed or restarted). Retry the analysis."
+)
 
 
 class RunAlreadyActive(Exception):

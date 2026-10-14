@@ -256,9 +256,21 @@ def test_survey_error_fails_the_run(video: Video, analyze, write_fixture) -> Non
     run.refresh_from_db()
     video.refresh_from_db()
     assert (run.status, run.stop_reason, video.status) == ("failed", "error", "failed")
-    assert run.error_message.startswith("The survey step failed")
+    assert run.error_message.startswith("The model returned invalid output twice during the survey")
     steps = _steps(run)
     assert [(s.node, s.status) for s in steps] == [("survey", "error")]
+
+
+def test_report_error_fails_the_run(video: Video, analyze, write_fixture) -> None:
+    write_fixture(error_on=["report"])
+
+    run = analyze(video)
+
+    run.refresh_from_db()
+    assert (run.status, run.stop_reason) == ("failed", "error")
+    assert run.error_message.startswith("The model returned invalid output twice during the report")
+    assert _steps(run)[-1].node == "report"
+    assert "report" in video_detail_error(video)
 
 
 def test_inspect_error_drops_candidates_and_continues(video: Video, analyze, write_fixture) -> None:
@@ -309,8 +321,8 @@ def test_provider_down_after_retries_fails_the_survey(
 
     run.refresh_from_db()
     assert (run.status, run.stop_reason) == ("failed", "error")
-    assert run.error_message == (
-        "The survey step failed: the LLM provider did not answer after several retries."
+    assert run.error_message.startswith(
+        "The LLM provider did not answer during the survey step, even after several retries."
     )
     [step] = _steps(run)
     assert (step.node, step.status, step.error_message) == (

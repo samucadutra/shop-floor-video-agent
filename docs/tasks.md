@@ -244,14 +244,14 @@ Manual check in the browser:
 
 **Goal:** the PoC behaves well when things go wrong, and leaks nothing.
 
-- [ ] **8.1** JSON logging with the context filter and the redaction filter (S16), for Django, Celery and the agent.
-- [ ] **8.2** Tests for the redaction filter (env-based values, `AIza…`, `sk-…`, `Bearer …`).
-- [ ] **8.3** Clear user-facing `error_message` for each failure type: quota exhausted, timeout, invalid LLM output, ffmpeg failure, worker lost (stale run).
-- [ ] **8.4** UI: a partial-result banner with the stop reason, the failed-run message and the Retry button (check them against each failure type).
-- [ ] **8.5** CORS: allowed only for `CORS_ALLOWED_ORIGINS`. Test with an allowed and a blocked origin.
-- [ ] **8.6** Upload limits are enforced on the server even when the client check is skipped (tests already exist from Phase 2; add one test with a real 201 MB sparse file).
-- [ ] **8.7** Check that `DJANGO_DEBUG=false` returns JSON 404 and 500 responses with no stack traces.
-- [ ] **8.8** Check that `.env` is git-ignored and that `.env.example` matches S14 (a test compares the keys in `.env.example` with a list in settings).
+- [x] **8.1** JSON logging with the context filter and the redaction filter (S16), for Django, Celery and the agent.
+- [x] **8.2** Tests for the redaction filter (env-based values, `AIza…`, `sk-…`, `Bearer …`).
+- [x] **8.3** Clear user-facing `error_message` for each failure type: quota exhausted, timeout, invalid LLM output, ffmpeg failure, worker lost (stale run).
+- [x] **8.4** UI: a partial-result banner with the stop reason, the failed-run message and the Retry button (check them against each failure type).
+- [x] **8.5** CORS: allowed only for `CORS_ALLOWED_ORIGINS`. Test with an allowed and a blocked origin.
+- [x] **8.6** Upload limits are enforced on the server even when the client check is skipped (tests already exist from Phase 2; add one test with a real 201 MB sparse file).
+- [x] **8.7** Check that `DJANGO_DEBUG=false` returns JSON 404 and 500 responses with no stack traces.
+- [x] **8.8** Check that `.env` is git-ignored and that `.env.example` matches S14 (a test compares the keys in `.env.example` with a list in settings).
 
 ### Verify
 

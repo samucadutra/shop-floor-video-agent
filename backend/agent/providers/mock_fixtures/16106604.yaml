@@ -1,0 +1,24 @@
+# Sample 1 (PRD Appendix A): men working at a construction site. Times checked on 2 fps frames.
+sha256: e20b2a53363817e70a236b7139b48a6c85bd14ba822f8f741ab64500e2e55a75
+filename: 16106604.mp4
+scene_notes: Outdoor lumber yard with stacked pallets, a large yard forklift and several workers.
+events:
+  - event_type: missing_ppe
+    time_s: 2.0
+    start_s: 0.0
+    end_s: 4.5
+    severity: medium
+    confidence: 0.88
+    explanation: A worker in a lime hi-vis vest walks through the yard without a hard hat.
+  - event_type: unsafe_proximity
+    time_s: 7.0
+    start_s: 5.5
+    end_s: 21.0
+    severity: high
+    confidence: 0.82
+    explanation: A worker on foot stands about one meter from the yard forklift while it moves.
+decoys:
+  - event_type: missing_ppe
+    time_s: 15.0
+    reason: Worker beside the forklift, seen from behind.
+    drop_reason: The worker wears a white hard hat and an orange hi-vis jacket.

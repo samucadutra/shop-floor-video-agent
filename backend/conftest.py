@@ -14,6 +14,14 @@ def media_root(settings, tmp_path: Path) -> Path:
     return root
 
 
+@pytest.fixture(autouse=True)
+def mock_llm(settings) -> None:
+    """Tests never call a real LLM: the mock provider, with no delay."""
+    settings.LLM_PROVIDER = "mock"
+    settings.LLM_MODEL = ""
+    settings.MOCK_LATENCY_MS = 0
+
+
 @pytest.fixture
 def make_test_video(tmp_path: Path) -> Callable[..., Path]:
     """Return a factory that creates a small test clip with ffmpeg's testsrc."""

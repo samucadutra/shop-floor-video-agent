@@ -1,0 +1,19 @@
+# Sample 2 (PRD Appendix A): forklift driver in a warehouse. Times checked on 2 fps frames.
+sha256: 85f85ea690f98a8d920f9180d2538867fd4f1fa682857a28e834aa94f8e0639b
+filename: 4294438.mp4
+scene_notes: A red reach truck in front of a metal wall, driven by one worker. No other people.
+events:
+  - event_type: missing_ppe
+    time_s: 8.5
+    start_s: 0.0
+    end_s: 14.5
+    severity: medium
+    confidence: 0.9
+    explanation: >-
+      The forklift driver wears a knitted beanie and a padded vest, with no hard hat and no
+      hi-vis vest, for the whole clip.
+decoys:
+  - event_type: unsafe_proximity
+    time_s: 5.0
+    reason: A person is right next to the forklift mast.
+    drop_reason: The only person is the driver seated in the cab; nobody is on foot nearby.

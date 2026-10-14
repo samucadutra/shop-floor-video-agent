@@ -4,6 +4,8 @@ from pathlib import Path
 
 import environ
 
+from agent.guardrails import AgentLimits
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env()
@@ -80,11 +82,29 @@ CELERY_WORKER_PREFETCH_MULTIPLIER = 1
 LLM_PROVIDER = env("LLM_PROVIDER", default="gemini")
 LLM_MODEL = env(f"{LLM_PROVIDER.upper()}_MODEL", default="")
 
-# Analysis run and frame extraction (spec S5, S9).
+# Analysis run and frame extraction (spec S5, S6.4, S9).
 AGENT_RUN_TIMEOUT_SECONDS = env.int("AGENT_RUN_TIMEOUT_SECONDS", default=600)
 SURVEY_INTERVAL_S = env.float("SURVEY_INTERVAL_S", default=2)
 SCENE_THRESHOLD = env.float("SCENE_THRESHOLD", default=0.4)
 FRAME_MAX_SIDE = env.int("FRAME_MAX_SIDE", default=768)
+INSPECT_FPS = env.float("INSPECT_FPS", default=2)
+WINDOW_PADDING_S = env.float("WINDOW_PADDING_S", default=2)
+
+# Agent (spec S6, S7). Event types file paths are relative to the backend directory.
+EVENT_TYPES_FILE = BASE_DIR / env("EVENT_TYPES_FILE", default="agent/event_types.yaml")
+FRAMES_PER_CALL = env.int("FRAMES_PER_CALL", default=12)
+CONFIDENCE_THRESHOLD = env.float("CONFIDENCE_THRESHOLD", default=0.6)
+LLM_INPUT_PRICE_PER_MTOK = env.float("LLM_INPUT_PRICE_PER_MTOK", default=0)
+LLM_OUTPUT_PRICE_PER_MTOK = env.float("LLM_OUTPUT_PRICE_PER_MTOK", default=0)
+MOCK_LATENCY_MS = env.int("MOCK_LATENCY_MS", default=300)
+AGENT = AgentLimits(
+    max_iterations=env.int("AGENT_MAX_ITERATIONS", default=3),
+    max_frames=env.int("AGENT_MAX_FRAMES", default=120),
+    max_tokens=env.int("AGENT_MAX_TOKENS", default=200000),
+    max_cost_usd=env.float("AGENT_MAX_COST_USD", default=0.50),
+    max_llm_calls=env.int("AGENT_MAX_LLM_CALLS", default=20),
+    report_reserve_tokens=env.int("AGENT_REPORT_RESERVE_TOKENS", default=4000),
+)
 
 LOG_LEVEL = env("LOG_LEVEL", default="INFO")
 

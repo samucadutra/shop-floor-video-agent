@@ -1,0 +1,23 @@
+# Used when no fixture matches the video. Times are fractions of the video duration.
+relative_times: true
+scene_notes: Demo analysis with the mock provider (no fixture for this video).
+events:
+  - event_type: missing_ppe
+    time_s: 0.2
+    start_s: 0.1
+    end_s: 0.3
+    severity: medium
+    confidence: 0.75
+    explanation: Demo event (no fixture). A worker without a hard hat.
+  - event_type: fallen_object_or_spill
+    time_s: 0.8
+    start_s: 0.7
+    end_s: 0.9
+    severity: low
+    confidence: 0.7
+    explanation: Demo event (no fixture). An object on the floor of a walkway.
+decoys:
+  - event_type: unsafe_proximity
+    time_s: 0.5
+    reason: Demo candidate (no fixture). A person may be close to a machine.
+    drop_reason: Demo event (no fixture). Nobody is near a moving machine.

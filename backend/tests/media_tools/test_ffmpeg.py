@@ -45,7 +45,7 @@ def test_window_frames_at_fps(make_test_video, tmp_path: Path) -> None:
     frames = extract_window(make_test_video(seconds=10), tmp_path / "out", 2, 6, 2)
 
     assert [f.timestamp_s for f in frames] == [2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5]
-    assert frames[0].path.name == "win_0002.00_0001.jpg"
+    assert frames[0].path.name == "win_0002.00_0006.00_0001.jpg"
 
 
 def test_scene_change_is_found(tmp_path: Path) -> None:
@@ -54,6 +54,10 @@ def test_scene_change_is_found(tmp_path: Path) -> None:
     assert len(frames) == 1
     assert frames[0].timestamp_s == pytest.approx(3, abs=0.1)
     assert frames[0].path.is_file()
+
+
+def test_clip_without_scene_change_gives_no_scene_frames(make_test_video, tmp_path: Path) -> None:
+    assert extract_scenes(make_test_video(seconds=3), tmp_path / "out", 0.4) == []
 
 
 @pytest.mark.parametrize(

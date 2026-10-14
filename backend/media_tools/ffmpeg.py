@@ -94,7 +94,11 @@ class ExtractedFrame:
     path: Path
 
 
-def _run_ffmpeg(args: list[str]) -> str:
+# ffmpeg exits with an error when a filter selects no frame (e.g. a clip with no scene change).
+NOTHING_WRITTEN = "Nothing was written into output file"
+
+
+def _run_ffmpeg(args: list[str], *, allow_no_output: bool = False) -> str:
     """Run ffmpeg with an argument list and return its stderr."""
     try:
         result = subprocess.run(
@@ -105,6 +109,8 @@ def _run_ffmpeg(args: list[str]) -> str:
             timeout=FFMPEG_TIMEOUT_S,
         )
     except subprocess.CalledProcessError as exc:
+        if allow_no_output and NOTHING_WRITTEN in (exc.stderr or ""):
+            return exc.stderr
         raise FFmpegError(f"ffmpeg exited with code {exc.returncode}.") from exc
     except subprocess.TimeoutExpired as exc:
         raise FFmpegError("ffmpeg timed out.") from exc
@@ -157,7 +163,8 @@ def extract_scenes(
             "-q:v",
             "4",
             str(out_dir / "scene_%04d.jpg"),
-        ]
+        ],
+        allow_no_output=True,
     )
     times = [round(float(t), 3) for t in PTS_TIME.findall(stderr)]
     paths = _outputs(out_dir, "scene_*.jpg")
@@ -175,7 +182,7 @@ def extract_window(
 ) -> list[ExtractedFrame]:
     """Frames at `fps` between `start` and `end`; frame n is at start + (n - 1) / fps."""
     out_dir.mkdir(parents=True, exist_ok=True)
-    prefix = f"win_{start:07.2f}"
+    prefix = f"win_{start:07.2f}_{end:07.2f}"  # unique per window, so frames are never reused
     _run_ffmpeg(
         [
             "-loglevel",

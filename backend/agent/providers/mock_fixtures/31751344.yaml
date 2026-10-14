@@ -1,0 +1,30 @@
+# Sample 4 (PRD Appendix A): control clip, forklift in storage aisles. Times checked on 2 fps frames.
+sha256: 2d4cc7eb91aa93361a0e1d756451452c073fcbd46a741e4e954aa4e1ddf5de18
+filename: 31751344.mp4
+scene_notes: >-
+  Empty storage aisle with high racks. A yellow forklift crosses the aisle twice; close-ups of
+  its dashboard in between. No people on foot.
+events:
+  - event_type: missing_ppe
+    time_s: 6.5
+    start_s: 4.5
+    end_s: 8.5
+    severity: low
+    confidence: 0.7
+    explanation: The forklift driver wears dark work clothes with no hard hat and no hi-vis vest.
+  - event_type: missing_ppe
+    time_s: 31.5
+    start_s: 30.5
+    end_s: 33.5
+    severity: low
+    confidence: 0.7
+    explanation: On the second pass the driver again has no hard hat and no hi-vis vest.
+decoys:
+  - event_type: unsafe_proximity
+    time_s: 7.0
+    reason: Forklift moving through the aisle.
+    drop_reason: There is no person on foot in the aisle, only the driver.
+  - event_type: unsafe_proximity
+    time_s: 32.0
+    reason: Forklift passes close to the racks.
+    drop_reason: There is no person on foot in the aisle, only the driver.

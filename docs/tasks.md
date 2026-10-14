@@ -114,15 +114,15 @@ docker compose logs worker --tail 20                                            
 
 **Goal:** the full survey → plan → inspect → verify → report loop runs offline with the mock, and saves events, a summary and a trace.
 
-- [ ] **4.1** `agent/event_types.yaml` and its loader (S6.1).
-- [ ] **4.2** `agent/schemas.py` (S8) with unit tests for valid and invalid payloads.
-- [ ] **4.3** `agent/providers/base.py`, `client.py` (parse, validate, one retry, cost; throttle and backoff can be no-ops until Phase 5) and `factory.py` (S7.1–S7.3).
-- [ ] **4.4** `agent/providers/mock.py` and the `MockFixture` schema (S7.4). Write `generic.yaml`.
-- [ ] **4.5** Write the 4 sample fixtures from PRD Appendix A, with times checked frame by frame (extract frames at 2 fps and read them).
-- [ ] **4.6** `agent/state.py`, `guardrails.py` (`AgentLimits`, `budget_exceeded`) and `tools.py` (`get_frames`, `analyze_frames`, `save_event`) (S6.2, S6.5, S6.6).
-- [ ] **4.7** `agent/prompts.py` (S6.8) and `agent/nodes.py` (S6.4).
-- [ ] **4.8** `agent/graph.py` (S6.3), `repository.py` (`record_step`, `save_event`) and `runner.py`. Connect `analyze_video` to `run_agent`.
-- [ ] **4.9** Tests with the mock (no network): a full run on a test clip creates events, a summary and ≥ 5 steps; each guardrail (iterations, frames, tokens, LLM calls) stops the run with `is_partial=true` and the right `stop_reason`; `invalid_json_once` gives a `retried` step and the run succeeds; `error_on: [survey]` fails the run; `error_on: [inspect]` drops candidates and the run continues; a decoy is dropped; re-analysis does not duplicate events.
+- [x] **4.1** `agent/event_types.yaml` and its loader (S6.1).
+- [x] **4.2** `agent/schemas.py` (S8) with unit tests for valid and invalid payloads.
+- [x] **4.3** `agent/providers/base.py`, `client.py` (parse, validate, one retry, cost; throttle and backoff can be no-ops until Phase 5) and `factory.py` (S7.1–S7.3).
+- [x] **4.4** `agent/providers/mock.py` and the `MockFixture` schema (S7.4). Write `generic.yaml`.
+- [x] **4.5** Write the 4 sample fixtures from PRD Appendix A, with times checked frame by frame (extract frames at 2 fps and read them).
+- [x] **4.6** `agent/state.py`, `guardrails.py` (`AgentLimits`, `budget_exceeded`) and `tools.py` (`get_frames`, `analyze_frames`, `save_event`) (S6.2, S6.5, S6.6).
+- [x] **4.7** `agent/prompts.py` (S6.8) and `agent/nodes.py` (S6.4).
+- [x] **4.8** `agent/graph.py` (S6.3), `repository.py` (`record_step`, `save_event`) and `runner.py`. Connect `analyze_video` to `run_agent`.
+- [x] **4.9** Tests with the mock (no network): a full run on a test clip creates events, a summary and ≥ 5 steps; each guardrail (iterations, frames, tokens, LLM calls) stops the run with `is_partial=true` and the right `stop_reason`; `invalid_json_once` gives a `retried` step and the run succeeds; `error_on: [survey]` fails the run; `error_on: [inspect]` drops candidates and the run continues; a decoy is dropped; re-analysis does not duplicate events.
 
 ### Verify
 

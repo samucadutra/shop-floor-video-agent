@@ -1,17 +1,15 @@
-"""Celery task that runs one analysis (docs/spec.md S5.2).
-
-Phase 3 skeleton: it extracts the survey frames only. The agent is connected in Phase 4.
-"""
+"""Celery task that runs one analysis with the agent (docs/spec.md S5.2)."""
 
 import logging
-from pathlib import Path
+from decimal import Decimal
 
 from celery import shared_task
 from celery.exceptions import SoftTimeLimitExceeded
 from django.conf import settings
 from django.utils import timezone
 
-from media_tools.ffmpeg import extract_survey
+from agent.nodes import AgentFailed
+from agent.runner import run_agent
 from videos.models import AnalysisRun, RunStatus, StopReason
 from videos.services import RunResult, fail_run, finish_run
 
@@ -38,13 +36,22 @@ def analyze_video(self, run_id: str) -> None:
     run.save(update_fields=["status", "started_at", "celery_task_id"])
 
     try:
-        frames = extract_survey(
-            Path(run.video.file.path),
-            Path(settings.MEDIA_ROOT) / "frames" / str(run.id),
-            settings.SURVEY_INTERVAL_S,
-            max_side=settings.FRAME_MAX_SIDE,
+        outcome = run_agent(str(run.id), settings)
+        result = RunResult(
+            summary=outcome.summary,
+            is_partial=outcome.is_partial,
+            stop_reason=outcome.stop_reason,
+            iterations=outcome.iterations,
+            frames_analyzed=outcome.frames_analyzed,
+            llm_calls=outcome.llm_calls,
+            input_tokens=outcome.input_tokens,
+            output_tokens=outcome.output_tokens,
+            estimated_cost_usd=Decimal(str(round(outcome.cost_usd, 4))),
         )
-        finish_run(run, RunResult(frames_analyzed=len(frames)))
+        finish_run(run, result)
+    except AgentFailed as exc:
+        logger.warning("Run %s failed: %s", run_id, exc)
+        fail_run(run, StopReason.ERROR, str(exc))
     except SoftTimeLimitExceeded:
         logger.warning("Run %s hit the time limit", run_id)
         message = f"The analysis took longer than {settings.AGENT_RUN_TIMEOUT_SECONDS} seconds."

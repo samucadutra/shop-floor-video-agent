@@ -1,0 +1,20 @@
+# Sample 3 (PRD Appendix A): workers cleaning a warehouse. Times checked on 2 fps frames.
+sha256: aadaf12cddba076bf6a7acf31abea68f75b121f90a45cf7d9283fd1082819851
+filename: 13422071.mp4
+scene_notes: >-
+  Warehouse aisle with wrapped pallets. Workers in orange hi-vis vests mop the floor, push a
+  cleaning cart and then a floor scrubber.
+events:
+  - event_type: fallen_object_or_spill
+    time_s: 1.0
+    start_s: 0.5
+    end_s: 3.0
+    severity: low
+    confidence: 0.78
+    explanation: >-
+      The floor is being mopped and is wet; a cleaning cart with a caution sign is brought in.
+decoys:
+  - event_type: missing_ppe
+    time_s: 10.5
+    reason: Worker pushing a floor scrubber, head out of the frame.
+    drop_reason: The worker wears an orange hi-vis vest; no missing PPE is visible.

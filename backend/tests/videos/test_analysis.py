@@ -11,7 +11,7 @@ from rest_framework.test import APIClient
 
 from media_tools.ffmpeg import FFmpegError
 from tests.videos.factories import create_event, create_run, create_video
-from videos.models import AnalysisRun, RunStatus, StopReason, Video, VideoStatus
+from videos.models import AnalysisRun, Event, RunStatus, StopReason, Video, VideoStatus
 from videos.services import STALE_RUN_MESSAGE
 from videos.tasks import ERROR_MESSAGE
 
@@ -64,10 +64,11 @@ def test_status_flow_uploaded_processing_done(
     assert run.status == RunStatus.SUCCEEDED
     assert run.stop_reason == StopReason.COMPLETED
     assert (run.provider, run.model) == ("mock", "")
-    assert run.frames_analyzed == 2  # 3 s clip, one frame every 2 s
+    assert run.frames_analyzed > 0
+    assert run.summary
     assert run.started_at and run.finished_at and run.duration_ms is not None
     assert run.celery_task_id
-    assert len(list((media_root / "frames" / run_id).glob("*.jpg"))) == 2
+    assert len(list((media_root / "frames" / run_id).glob("*.jpg"))) >= run.frames_analyzed
 
 
 def test_second_start_returns_409(
@@ -109,7 +110,7 @@ def test_failure_sets_failed_and_keeps_current_run(
     video.save()
 
     with (
-        patch("videos.tasks.extract_survey", side_effect=error),
+        patch("videos.tasks.run_agent", side_effect=error),
         django_capture_on_commit_callbacks(execute=True),
     ):
         run_id = _analyze(client, video).json()["run_id"]
@@ -141,7 +142,8 @@ def test_reanalysis_deletes_older_run(
     assert video.status == VideoStatus.DONE
     assert [str(r.id) for r in video.runs.all()] == [second_id]
     assert str(video.current_run_id) == second_id
-    assert client.get(f"/api/videos/{video.id}/events/").json() == []
+    # The older run's events (CASCADE) are gone; only the new run's events are left.
+    assert {str(e.run_id) for e in Event.objects.filter(video=video)} <= {second_id}
 
 
 def _stale_run(status: str = RunStatus.RUNNING) -> AnalysisRun:

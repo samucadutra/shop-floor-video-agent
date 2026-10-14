@@ -1,0 +1,13 @@
+# Event types the agent looks for. Adding a type means adding an entry here (no code change).
+- key: missing_ppe
+  label: Missing PPE
+  description: A person without a hard hat or without a high-visibility safety vest.
+  default_severity: medium
+- key: unsafe_proximity
+  label: Unsafe proximity
+  description: A person on foot within about 2 meters of moving machinery or a moving forklift.
+  default_severity: high
+- key: fallen_object_or_spill
+  label: Fallen object or spill
+  description: An object dropped on the floor, or a liquid spill or wet floor in a work area.
+  default_severity: medium

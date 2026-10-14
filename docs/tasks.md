@@ -50,15 +50,15 @@ make lint-frontend                                  # ESLint and tsc report no e
 
 **Goal:** videos can be uploaded, listed, read and played (with seeking). There is no analysis yet.
 
-- [ ] **2.1** Models `Video`, `AnalysisRun`, `Event`, `AgentStep` with the choices and constraints from S3. Create migrations.
-- [ ] **2.2** `media_tools/ffmpeg.py: probe()` (S9). It is needed by upload validation.
-- [ ] **2.3** `videos/validators.py: validate_upload` (S4.2): extension, MIME type, size, ffprobe, duration, SHA-256.
-- [ ] **2.4** Serializers from S4.1.
-- [ ] **2.5** `VideoViewSet` (create, list, retrieve, `events` action) and `RunTraceView`. URLs from S4; `/events/` and `/trace/` return empty lists for now.
-- [ ] **2.6** `core.views.serve_media` with Range support (S4.5), mounted at `/media/`.
-- [ ] **2.7** `scripts/download_samples.sh` and the `make samples` target (S15).
-- [ ] **2.8** Test helper `make_test_video(tmp_path, seconds)` in `conftest.py` (ffmpeg `testsrc`, S9).
-- [ ] **2.9** Tests: valid upload (201, metadata saved), wrong extension, wrong MIME type, a fake `.mp4` (ffprobe fails), too large (setting overridden), too long, list pagination and `event_count`, detail 404, Range request (206 and `Content-Range`), path traversal (404).
+- [x] **2.1** Models `Video`, `AnalysisRun`, `Event`, `AgentStep` with the choices and constraints from S3. Create migrations.
+- [x] **2.2** `media_tools/ffmpeg.py: probe()` (S9). It is needed by upload validation.
+- [x] **2.3** `videos/validators.py: validate_upload` (S4.2): extension, MIME type, size, ffprobe, duration, SHA-256.
+- [x] **2.4** Serializers from S4.1.
+- [x] **2.5** `VideoViewSet` (create, list, retrieve, `events` action) and `RunTraceView`. URLs from S4; `/events/` and `/trace/` return empty lists for now.
+- [x] **2.6** `core.views.serve_media` with Range support (S4.5), mounted at `/media/`.
+- [x] **2.7** `scripts/download_samples.sh` and the `make samples` target (S15).
+- [x] **2.8** Test helper `make_test_video(tmp_path, seconds)` in `conftest.py` (ffmpeg `testsrc`, S9).
+- [x] **2.9** Tests: valid upload (201, metadata saved), wrong extension, wrong MIME type, a fake `.mp4` (ffprobe fails), too large (setting overridden), too long, list pagination and `event_count`, detail 404, Range request (206 and `Content-Range`), path traversal (404).
 
 ### Verify
 

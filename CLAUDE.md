@@ -53,5 +53,7 @@ Add each command here when it is created, with one line saying what it does. Run
 | Lint | `make lint` | `lint-backend` + `lint-frontend` |
 | Lint backend | `make lint-backend` | `ruff check .` and `ruff format --check .` in the backend container |
 | Lint frontend | `make lint-frontend` | ESLint + `tsc --noEmit` in a throwaway `node:22-alpine` container |
+| Sample videos | `make samples` | Downloads the 4 demo clips to `samples/` (git-ignored) and checks their SHA-256 |
+| Migrations | `docker compose run --rm -v "$PWD/backend:/app" backend python manage.py makemigrations` | Writes new migration files into `backend/` (the image has no source mount) |
 
 URLs: frontend http://localhost:3000, API http://localhost:8000/api/.

@@ -1,4 +1,4 @@
-.PHONY: up down logs test lint lint-backend lint-frontend
+.PHONY: up down logs test lint lint-backend lint-frontend samples
 
 # Start the whole stack (builds images when needed).
 up:
@@ -26,3 +26,7 @@ lint-frontend:
 	docker run --rm -v "$(CURDIR)/frontend:/src:ro" node:22-alpine sh -c '\
 		mkdir /app && tar -C /src --exclude=node_modules --exclude=.next -cf - . | tar -C /app -xf - && \
 		cd /app && npm ci --no-audit --no-fund --loglevel=error && npm run lint && npm run typecheck'
+
+# Downloads the 4 demo clips (PRD Appendix A) into samples/ and checks their SHA-256.
+samples:
+	./scripts/download_samples.sh

@@ -222,7 +222,7 @@ All routes are under `/api/`. Errors use DRF's default format.
 Checks run in this order and stop at the first failure (`400` with a field error on `file`):
 
 1. Extension in `{.mp4, .mov, .webm}` (case insensitive).
-2. Declared content type in `{video/mp4, video/quicktime, video/webm}`.
+2. Declared content type in `{video/mp4, video/quicktime, video/webm}`, or `application/octet-stream`. curl and some clients send that generic type when they don't know the format; step 4 (ffprobe) is the real format check. Any other type, such as `text/plain`, is rejected.
 3. Size ≤ `MAX_UPLOAD_MB` MiB.
 4. The file is written to a temp path and probed with `ffprobe` (S9). It must have at least one video stream, and `duration ≤ MAX_VIDEO_SECONDS`.
 5. SHA-256 is computed while streaming to disk.

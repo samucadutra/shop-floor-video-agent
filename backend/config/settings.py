@@ -52,6 +52,11 @@ STATIC_URL = "static/"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = Path(env("MEDIA_ROOT", default=str(BASE_DIR / "media")))
 
+# Uploads always go to a temp file on disk, so ffprobe can read them (spec S4.2).
+FILE_UPLOAD_HANDLERS = ["django.core.files.uploadhandler.TemporaryFileUploadHandler"]
+MAX_UPLOAD_BYTES = int(env.float("MAX_UPLOAD_MB", default=200) * 1024 * 1024)
+MAX_VIDEO_SECONDS = env.int("MAX_VIDEO_SECONDS", default=130)
+
 CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=["http://localhost:3000"])
 
 REST_FRAMEWORK = {

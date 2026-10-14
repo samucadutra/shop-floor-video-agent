@@ -88,6 +88,7 @@ services:
       context: ./frontend
       args:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+        NEXT_PUBLIC_MAX_UPLOAD_MB: ${NEXT_PUBLIC_MAX_UPLOAD_MB:-200}
     image: shop-floor-frontend:dev
     ports:
       - "3000:3000"

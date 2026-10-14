@@ -180,13 +180,13 @@ curl -fsS http://localhost:8000/api/videos/$VID/events/ | python3 -m json.tool
 
 **Goal:** a user can do the whole flow in the browser.
 
-- [ ] **6.1** `lib/types.ts`, `lib/api.ts` (with upload progress through XHR) and `lib/format.ts` (S10.3).
-- [ ] **6.2** `hooks/usePolling.ts`.
-- [ ] **6.3** `layout.tsx` + `Nav`, and `/` redirecting to `/videos`.
-- [ ] **6.4** `/upload`: `UploadNotice`, `Dropzone` with client side type and size checks, progress bar, Analyze button, redirect to the detail page.
-- [ ] **6.5** `/videos`: responsive table/cards, `StatusBadge`, event count, polling while processing, empty and error states.
-- [ ] **6.6** `/videos/[id]`: `VideoPlayer` (`seekTo`), `EventTimeline`, `EventCard`, `SeverityBadge`, `SummaryCard`, Analyze/Re-analyze button, polling, failed-run banner.
-- [ ] **6.7** Check the layout at 375 px and 1280 px wide.
+- [x] **6.1** `lib/types.ts`, `lib/api.ts` (with upload progress through XHR) and `lib/format.ts` (S10.3).
+- [x] **6.2** `hooks/usePolling.ts`.
+- [x] **6.3** `layout.tsx` + `Nav`, and `/` redirecting to `/videos`.
+- [x] **6.4** `/upload`: `UploadNotice`, `Dropzone` with client side type and size checks, progress bar, Analyze button, redirect to the detail page.
+- [x] **6.5** `/videos`: responsive table/cards, `StatusBadge`, event count, polling while processing, empty and error states.
+- [x] **6.6** `/videos/[id]`: `VideoPlayer` (`seekTo`), `EventTimeline`, `EventCard`, `SeverityBadge`, `SummaryCard`, Analyze/Re-analyze button, polling, failed-run banner.
+- [x] **6.7** Check the layout at 375 px and 1280 px wide.
 
 ### Verify
 

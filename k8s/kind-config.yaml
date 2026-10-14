@@ -1,0 +1,11 @@
+# Local single-node cluster. NodePorts are mapped to the same host ports as Compose.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: shop-floor
+nodes:
+  - role: control-plane
+    extraPortMappings:
+      - containerPort: 30080 # backend Service NodePort
+        hostPort: 8000
+      - containerPort: 30030 # frontend Service NodePort
+        hostPort: 3000

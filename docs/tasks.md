@@ -275,10 +275,10 @@ curl -s http://localhost:8000/api/nope/ | head -c 200                           
 
 **Goal:** the full stack runs on a local kind cluster.
 
-- [ ] **9.1** `k8s/kind-config.yaml` with the port mappings (S12).
-- [ ] **9.2** Manifests `00`–`07` (S12): namespace, configmap, postgres, redis, media PVC, backend (with the migrate init container), worker, frontend.
-- [ ] **9.3** The `kind-up` and `kind-down` Makefile targets (S15).
-- [ ] **9.4** README section "Run on kind".
+- [x] **9.1** `k8s/kind-config.yaml` with the port mappings (S12).
+- [x] **9.2** Manifests `00`–`07` (S12): namespace, configmap, postgres, redis, media PVC, backend (with the migrate init container), worker, frontend.
+- [x] **9.3** The `kind-up` and `kind-down` Makefile targets (S15).
+- [x] **9.4** README section "Run on kind".
 
 ### Verify
 

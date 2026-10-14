@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: shop-floor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      # Migrations run before the API starts (spec S12).
+      initContainers:
+        - name: migrate
+          image: shop-floor-backend:dev
+          imagePullPolicy: IfNotPresent
+          command: ["python", "manage.py", "migrate", "--noinput"]
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secrets
+          env:
+            # Explicit env beats envFrom, so .env can't turn DEBUG on here (PRD §9).
+            - name: DJANGO_DEBUG
+              value: "false"
+      containers:
+        - name: backend
+          image: shop-floor-backend:dev
+          imagePullPolicy: IfNotPresent
+          command: ["gunicorn", "config.wsgi", "-b", "0.0.0.0:8000", "-w", "2", "--timeout", "120"]
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secrets
+          env:
+            - name: DJANGO_DEBUG
+              value: "false"
+          ports:
+            - containerPort: 8000
+          # The kubelet sends the pod IP as Host, which ALLOWED_HOSTS rejects; send localhost.
+          readinessProbe:
+            httpGet:
+              path: /api/health/
+              port: 8000
+              httpHeaders:
+                - name: Host
+                  value: localhost
+            periodSeconds: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /api/health/
+              port: 8000
+              httpHeaders:
+                - name: Host
+                  value: localhost
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 5
+          resources:
+            requests: { cpu: 250m, memory: 512Mi }
+            limits: { cpu: "1", memory: 1Gi }
+          volumeMounts:
+            - name: media
+              mountPath: /app/media
+      volumes:
+        - name: media
+          persistentVolumeClaim:
+            claimName: media
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: shop-floor
+spec:
+  type: NodePort
+  selector:
+    app: backend
+  ports:
+    - port: 8000
+      targetPort: 8000
+      nodePort: 30080

@@ -1,0 +1,13 @@
+# Uploads and frames, shared by backend and worker. RWO works because kind has one node;
+# production would use object storage (PRD §3).
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: media
+  namespace: shop-floor
+spec:
+  accessModes: ["ReadWriteOnce"]
+  storageClassName: standard
+  resources:
+    requests:
+      storage: 2Gi

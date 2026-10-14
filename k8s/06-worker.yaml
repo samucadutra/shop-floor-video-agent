@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker
+  namespace: shop-floor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: worker
+  template:
+    metadata:
+      labels:
+        app: worker
+    spec:
+      # Like Compose's depends_on: start only once the API is healthy (DB migrated, Redis up).
+      # A worker that connects while Redis is still starting can hang without consuming tasks.
+      initContainers:
+        - name: wait-for-backend
+          image: shop-floor-backend:dev
+          imagePullPolicy: IfNotPresent
+          command:
+            - python
+            - -c
+            - |
+              import time, urllib.request
+              while True:
+                  try:
+                      urllib.request.urlopen("http://backend:8000/api/health/", timeout=3)
+                      break
+                  except Exception:
+                      time.sleep(2)
+      containers:
+        - name: worker
+          image: shop-floor-backend:dev
+          imagePullPolicy: IfNotPresent
+          # Concurrency 1 keeps the in-process LLM throttle correct (spec S5.2).
+          command: ["celery", "-A", "config", "worker", "-l", "info", "-c", "1"]
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secrets
+          env:
+            - name: DJANGO_DEBUG
+              value: "false"
+          resources:
+            requests: { cpu: 250m, memory: 512Mi }
+            limits: { cpu: "1", memory: 1Gi }
+          volumeMounts:
+            - name: media
+              mountPath: /app/media
+      volumes:
+        - name: media
+          persistentVolumeClaim:
+            claimName: media

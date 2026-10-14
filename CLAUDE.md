@@ -55,5 +55,7 @@ Add each command here when it is created, with one line saying what it does. Run
 | Lint frontend | `make lint-frontend` | ESLint + `tsc --noEmit` in a throwaway `node:22-alpine` container |
 | Sample videos | `make samples` | Downloads the 4 demo clips to `samples/` (git-ignored) and checks their SHA-256 |
 | Migrations | `docker compose run --rm -v "$PWD/backend:/app" backend python manage.py makemigrations` | Writes new migration files into `backend/` (the image has no source mount) |
+| Kind up | `make kind-up` | Creates the kind cluster, builds and loads images, creates `app-secrets` from `.env`, applies `k8s/` |
+| Kind down | `make kind-down` | Deletes the kind cluster and its data |
 
 URLs: frontend http://localhost:3000, API http://localhost:8000/api/.

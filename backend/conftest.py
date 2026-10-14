@@ -1,5 +1,5 @@
 import subprocess
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
 from pathlib import Path
 
 import pytest
@@ -41,3 +41,14 @@ def make_test_video(tmp_path: Path) -> Callable[..., Path]:
         return path
 
     return _make
+
+
+@pytest.fixture
+def celery_eager() -> Iterator[None]:
+    """Run Celery tasks in-process (CELERY_TASK_ALWAYS_EAGER) for the duration of a test."""
+    from config.celery import app
+
+    previous = app.conf.task_always_eager
+    app.conf.task_always_eager = True
+    yield
+    app.conf.task_always_eager = previous

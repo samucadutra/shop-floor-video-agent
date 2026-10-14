@@ -13,6 +13,7 @@ from videos.serializers import (
     VideoListSerializer,
     VideoUploadSerializer,
 )
+from videos.services import RunAlreadyActive, mark_stale_runs, start_analysis
 
 
 class VideoViewSet(
@@ -42,6 +43,25 @@ class VideoViewSet(
         video = upload.save()
         body = VideoDetailSerializer(video, context=self.get_serializer_context()).data
         return Response(body, status=status.HTTP_201_CREATED)
+
+    def retrieve(self, request: Request, *args, **kwargs) -> Response:
+        video = self.get_object()
+        mark_stale_runs(video)  # refreshes video.status when a run is failed
+        return Response(self.get_serializer(video).data)
+
+    @action(detail=True, methods=["post"])
+    def analyze(self, request: Request, pk: str | None = None) -> Response:
+        video = self.get_object()
+        try:
+            run = start_analysis(video)
+        except RunAlreadyActive:
+            return Response(
+                {"detail": "An analysis is already running for this video."},
+                status=status.HTTP_409_CONFLICT,
+            )
+        return Response(
+            {"run_id": str(run.id), "status": run.status}, status=status.HTTP_202_ACCEPTED
+        )
 
     @action(detail=True, methods=["get"])
     def events(self, request: Request, pk: str | None = None) -> Response:

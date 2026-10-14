@@ -76,6 +76,16 @@ CELERY_TASK_IGNORE_RESULT = True
 CELERY_TASK_ACKS_LATE = True
 CELERY_WORKER_PREFETCH_MULTIPLIER = 1
 
+# LLM provider. The model name only comes from env (<PROVIDER>_MODEL, e.g. GEMINI_MODEL).
+LLM_PROVIDER = env("LLM_PROVIDER", default="gemini")
+LLM_MODEL = env(f"{LLM_PROVIDER.upper()}_MODEL", default="")
+
+# Analysis run and frame extraction (spec S5, S9).
+AGENT_RUN_TIMEOUT_SECONDS = env.int("AGENT_RUN_TIMEOUT_SECONDS", default=600)
+SURVEY_INTERVAL_S = env.float("SURVEY_INTERVAL_S", default=2)
+SCENE_THRESHOLD = env.float("SCENE_THRESHOLD", default=0.4)
+FRAME_MAX_SIDE = env.int("FRAME_MAX_SIDE", default=768)
+
 LOG_LEVEL = env("LOG_LEVEL", default="INFO")
 
 LOGGING = {

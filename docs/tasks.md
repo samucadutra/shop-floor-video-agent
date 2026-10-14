@@ -85,12 +85,12 @@ curl -s -o /dev/null -w "%{http_code}\n" -F file=@/tmp/fake.mp4 http://localhost
 
 **Goal:** "Analyze" runs a real background job that extracts frames and moves the statuses correctly. There is no LLM yet.
 
-- [ ] **3.1** `media_tools/ffmpeg.py`: `extract_survey`, `extract_scenes`, `extract_window` with the scale expression (S9).
-- [ ] **3.2** Tests for the extractors: frame counts and timestamps for a 10 s clip; a scene change found in a clip built with concat; frames are never larger than `FRAME_MAX_SIDE`.
-- [ ] **3.3** `videos/services.py`: `start_analysis`, `finish_run`, `fail_run`, `mark_stale_runs` (S5.1–S5.3).
-- [ ] **3.4** `analyze` action: returns 202 with `run_id`, or 409 if a run is active (S4, S5.1).
-- [ ] **3.5** `videos/tasks.py: analyze_video` skeleton. It sets `running`, extracts the survey frames to `MEDIA_ROOT/frames/<run_id>/`, records `frames_analyzed`, then calls `finish_run` with an empty result. Handles the soft time limit and errors (S5.2).
-- [ ] **3.6** Tests (with `CELERY_TASK_ALWAYS_EAGER` and `django_capture_on_commit_callbacks`): status flow `uploaded → processing → done`; 409 on a second start; a failure path sets `failed` and keeps `current_run`; re-analysis deletes the older run; a stale run is marked failed.
+- [x] **3.1** `media_tools/ffmpeg.py`: `extract_survey`, `extract_scenes`, `extract_window` with the scale expression (S9).
+- [x] **3.2** Tests for the extractors: frame counts and timestamps for a 10 s clip; a scene change found in a clip built with concat; frames are never larger than `FRAME_MAX_SIDE`.
+- [x] **3.3** `videos/services.py`: `start_analysis`, `finish_run`, `fail_run`, `mark_stale_runs` (S5.1–S5.3).
+- [x] **3.4** `analyze` action: returns 202 with `run_id`, or 409 if a run is active (S4, S5.1).
+- [x] **3.5** `videos/tasks.py: analyze_video` skeleton. It sets `running`, extracts the survey frames to `MEDIA_ROOT/frames/<run_id>/`, records `frames_analyzed`, then calls `finish_run` with an empty result. Handles the soft time limit and errors (S5.2).
+- [x] **3.6** Tests (with `CELERY_TASK_ALWAYS_EAGER` and `django_capture_on_commit_callbacks`): status flow `uploaded → processing → done`; 409 on a second start; a failure path sets `failed` and keeps `current_run`; re-analysis deletes the older run; a stale run is marked failed.
 
 ### Verify
 

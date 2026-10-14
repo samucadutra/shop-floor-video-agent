@@ -8,11 +8,14 @@ import redis
 from django.conf import settings
 from django.core.exceptions import SuspiciousFileOperation
 from django.db import connection
+from django.db.models import Avg, Count, F, Q, Sum
 from django.http import FileResponse, Http404, HttpRequest, HttpResponse, StreamingHttpResponse
 from django.utils._os import safe_join
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from videos.models import AnalysisRun, Event, RunStatus, Video
 
 logger = logging.getLogger(__name__)
 
@@ -48,6 +51,51 @@ class HealthView(APIView):
             "redis": "ok" if cache else "error",
         }
         return Response(body, status=200 if healthy else 503)
+
+
+class StatsView(APIView):
+    """Dashboard totals (S4.3). Event counts use each video's current run only."""
+
+    def get(self, request: Request) -> Response:
+        current_events = Event.objects.filter(run_id=F("video__current_run_id"))
+        by_type = (
+            current_events.values("event_type")
+            .annotate(count=Count("id"))
+            .order_by("-count", "event_type")
+        )
+        by_severity = (
+            current_events.values("severity").annotate(count=Count("id")).order_by("severity")
+        )
+        per_video = (
+            Video.objects.filter(current_run__isnull=False)
+            .annotate(count=Count("current_run__events"))
+            .order_by("-count", "original_name")
+            .values("id", "original_name", "count")
+        )
+        runs = AnalysisRun.objects.aggregate(
+            avg_processing_ms=Avg("duration_ms", filter=Q(status=RunStatus.SUCCEEDED)),
+            input_tokens=Sum("input_tokens", default=0),
+            output_tokens=Sum("output_tokens", default=0),
+            cost=Sum("estimated_cost_usd", default=0),
+            runs_succeeded=Count("id", filter=Q(status=RunStatus.SUCCEEDED)),
+            runs_failed=Count("id", filter=Q(status=RunStatus.FAILED)),
+        )
+        avg_ms = runs["avg_processing_ms"]
+        return Response(
+            {
+                "events_by_type": list(by_type),
+                "events_by_severity": list(by_severity),
+                "events_per_video": [
+                    {"video_id": str(v["id"]), "name": v["original_name"], "count": v["count"]}
+                    for v in per_video
+                ],
+                "avg_processing_ms": round(avg_ms) if avg_ms is not None else None,
+                "total_tokens": runs["input_tokens"] + runs["output_tokens"],
+                "total_estimated_cost_usd": f"{runs['cost']:.4f}",
+                "runs_succeeded": runs["runs_succeeded"],
+                "runs_failed": runs["runs_failed"],
+            }
+        )
 
 
 def _parse_range(header: str, size: int) -> tuple[int, int] | None:

@@ -7,6 +7,7 @@ import { useState } from "react";
 const LINKS = [
   { href: "/videos", label: "Videos" },
   { href: "/upload", label: "Upload" },
+  { href: "/dashboard", label: "Dashboard" },
 ];
 
 function Brand() {

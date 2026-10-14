@@ -213,11 +213,11 @@ Manual check in the browser (with `LLM_PROVIDER=mock`):
 
 **Goal:** users can see how the agent decided, and the totals across videos.
 
-- [ ] **7.1** `StatsView` at `/api/stats/` (S4.3), with tests: empty database, two videos with events, failed runs counted.
-- [ ] **7.2** `TracePanel` and `TraceStep` on the detail page (S10.2), refreshed while the run is in progress.
-- [ ] **7.3** `RunMetrics` on the detail page.
-- [ ] **7.4** `/dashboard`: 3 × `BarChartCard` (by type, by severity, per video) and `StatTile`s (average processing time, total tokens, total cost, runs succeeded/failed).
-- [ ] **7.5** Empty states for the dashboard and the trace.
+- [x] **7.1** `StatsView` at `/api/stats/` (S4.3), with tests: empty database, two videos with events, failed runs counted.
+- [x] **7.2** `TracePanel` and `TraceStep` on the detail page (S10.2), refreshed while the run is in progress.
+- [x] **7.3** `RunMetrics` on the detail page.
+- [x] **7.4** `/dashboard`: 3 × `BarChartCard` (by type, by severity, per video) and `StatTile`s (average processing time, total tokens, total cost, runs succeeded/failed).
+- [x] **7.5** Empty states for the dashboard and the trace.
 
 ### Verify
 

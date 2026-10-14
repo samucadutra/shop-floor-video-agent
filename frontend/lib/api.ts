@@ -1,4 +1,12 @@
-import type { AnalyzeResponse, Event, Paginated, Video, VideoListItem } from "./types";
+import type {
+  AnalyzeResponse,
+  Event,
+  Paginated,
+  RunTrace,
+  Stats,
+  Video,
+  VideoListItem,
+} from "./types";
 
 export const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000").replace(
   /\/$/,
@@ -58,6 +66,14 @@ export function getVideo(id: string): Promise<Video> {
 
 export function getEvents(id: string): Promise<Event[]> {
   return request(`/api/videos/${id}/events/`);
+}
+
+export function getTrace(runId: string): Promise<RunTrace> {
+  return request(`/api/runs/${runId}/trace/`);
+}
+
+export function getStats(): Promise<Stats> {
+  return request("/api/stats/");
 }
 
 export function analyzeVideo(id: string): Promise<AnalyzeResponse> {

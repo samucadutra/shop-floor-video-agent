@@ -6,9 +6,11 @@ import EmptyState from "@/components/EmptyState";
 import ErrorState from "@/components/ErrorState";
 import EventCard from "@/components/EventCard";
 import EventTimeline from "@/components/EventTimeline";
+import RunMetrics from "@/components/RunMetrics";
 import Spinner from "@/components/Spinner";
 import StatusBadge from "@/components/StatusBadge";
 import SummaryCard from "@/components/SummaryCard";
+import TracePanel from "@/components/TracePanel";
 import VideoPlayer, { type VideoPlayerHandle } from "@/components/VideoPlayer";
 import { usePolling } from "@/hooks/usePolling";
 import { analyzeVideo, ApiError, getEvents, getVideo } from "@/lib/api";
@@ -76,6 +78,8 @@ export default function VideoDetailPage({ params }: PageProps<"/videos/[id]">) {
   }
 
   const run = video.current_run;
+  // The trace follows the active run while it works, then the current (last good) run.
+  const traceRunId = video.active_run_id ?? run?.id ?? null;
   const label = video.status === "uploaded" ? "Analyze" : "Re-analyze";
 
   return (
@@ -119,6 +123,7 @@ export default function VideoDetailPage({ params }: PageProps<"/videos/[id]">) {
         <div className="flex flex-col gap-4">
           <VideoPlayer ref={player} src={video.file_url} />
           <EventTimeline events={events} durationS={video.duration_s} onSeek={seek} />
+          {run && <RunMetrics run={run} />}
         </div>
 
         <div className="flex flex-col gap-4">
@@ -148,6 +153,7 @@ export default function VideoDetailPage({ params }: PageProps<"/videos/[id]">) {
               </EmptyState>
             )
           )}
+          <TracePanel runId={traceRunId} live={video.active_run_id !== null} />
         </div>
       </div>
     </div>

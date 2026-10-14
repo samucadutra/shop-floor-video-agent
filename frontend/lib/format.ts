@@ -33,3 +33,8 @@ export function formatBytes(bytes: number): string {
 export function formatDate(iso: string): string {
   return new Date(iso).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
 }
+
+/** 412000 -> "412,000" */
+export function formatNumber(value: number): string {
+  return value.toLocaleString("en-US");
+}

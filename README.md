@@ -1,5 +1,8 @@
 # Shop Floor Video Agent
 
+<!-- Replace OWNER with the GitHub user or org once the remote exists. -->
+[![CI](https://github.com/samucadutra/shop-floor-video-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/samucadutra/shop-floor-video-agent/actions/workflows/ci.yml)
+
 An agentic AI system that analyzes short factory floor videos and reports safety events. Work in progress: see [docs/prd.md](docs/prd.md) and [docs/tasks.md](docs/tasks.md).
 
 ## Run on kind

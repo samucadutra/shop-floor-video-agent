@@ -57,5 +57,7 @@ Add each command here when it is created, with one line saying what it does. Run
 | Migrations | `docker compose run --rm -v "$PWD/backend:/app" backend python manage.py makemigrations` | Writes new migration files into `backend/` (the image has no source mount) |
 | Kind up | `make kind-up` | Creates the kind cluster, builds and loads images, creates `app-secrets` from `.env`, applies `k8s/` |
 | Kind down | `make kind-down` | Deletes the kind cluster and its data |
+| CI lint | `docker run --rm -v "$PWD":/repo -w /repo rhysd/actionlint:latest -color` | Lints `.github/workflows/ci.yml` |
+| K8s validate | `docker run --rm -v "$PWD/k8s":/k8s ghcr.io/yannh/kubeconform:latest -strict -summary -ignore-filename-pattern kind-config /k8s` | Validates the manifests (same as the CI `k8s` job) |
 
 URLs: frontend http://localhost:3000, API http://localhost:8000/api/.

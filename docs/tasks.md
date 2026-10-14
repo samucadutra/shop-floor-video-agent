@@ -304,10 +304,10 @@ make kind-down
 
 **Goal:** a workflow that lints, tests and builds everything with the mock provider.
 
-- [ ] **10.1** `.github/workflows/ci.yml` with the jobs `backend`, `frontend`, `docker` and `k8s` (S13).
-- [ ] **10.2** Make sure the tests read the DB and Redis from env so they run in CI service containers (no Compose).
-- [ ] **10.3** A CI status badge in the README (the URL is filled in once the user creates the remote).
-- [ ] **10.4** Run the same steps locally (below). The user pushes and checks the run on GitHub; Claude never pushes.
+- [x] **10.1** `.github/workflows/ci.yml` with the jobs `backend`, `frontend`, `docker` and `k8s` (S13).
+- [x] **10.2** Make sure the tests read the DB and Redis from env so they run in CI service containers (no Compose).
+- [x] **10.3** A CI status badge in the README (the URL is filled in once the user creates the remote).
+- [x] **10.4** Run the same steps locally (below). The user pushes and checks the run on GitHub; Claude never pushes.
 
 ### Verify
 

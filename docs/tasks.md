@@ -17,16 +17,16 @@ Unless a task says otherwise, the commands run from the repository root with the
 
 **Goal:** the empty stack starts with one command and the health endpoint answers.
 
-- [ ] **1.1** Create the repository layout from S1 (empty packages with `__init__.py`), `.gitignore`, and `README.md` with a title only.
-- [ ] **1.2** `backend/pyproject.toml` with the dependencies, ruff config and pytest config (S2). Create the Django project `config` and the apps `core` and `videos`.
-- [ ] **1.3** `config/settings.py` reading env with `django-environ` (S2, S14). Write `.env.example` with every S14 variable used so far.
-- [ ] **1.4** `config/celery.py` (Celery app, autodiscover) and `core` `HealthView` at `/api/health/` (S4.4).
-- [ ] **1.5** `backend/Dockerfile` (S11) with ffmpeg, a non-root user and dev dependencies.
-- [ ] **1.6** Create the Next.js app in `frontend/` (TypeScript strict, Tailwind, ESLint, `typecheck` script, `output: "standalone"`), with a placeholder home page. Write `frontend/Dockerfile` (S11).
-- [ ] **1.7** `docker-compose.yml` with the 5 services, healthchecks, volumes and env defaults (S11).
-- [ ] **1.8** `Makefile` with `up`, `down`, `logs`, `test`, `lint`, `lint-frontend` (S15).
-- [ ] **1.9** Test `tests/core/test_health.py`: 200 with DB and Redis up; 503 when Redis is unreachable (patched).
-- [ ] **1.10** Add the run, test and lint commands to `CLAUDE.md`.
+- [x] **1.1** Create the repository layout from S1 (empty packages with `__init__.py`), `.gitignore`, and `README.md` with a title only.
+- [x] **1.2** `backend/pyproject.toml` with the dependencies, ruff config and pytest config (S2). Create the Django project `config` and the apps `core` and `videos`.
+- [x] **1.3** `config/settings.py` reading env with `django-environ` (S2, S14). Write `.env.example` with every S14 variable used so far.
+- [x] **1.4** `config/celery.py` (Celery app, autodiscover) and `core` `HealthView` at `/api/health/` (S4.4).
+- [x] **1.5** `backend/Dockerfile` (S11) with ffmpeg, a non-root user and dev dependencies.
+- [x] **1.6** Create the Next.js app in `frontend/` (TypeScript strict, Tailwind, ESLint, `typecheck` script, `output: "standalone"`), with a placeholder home page. Write `frontend/Dockerfile` (S11).
+- [x] **1.7** `docker-compose.yml` with the 5 services, healthchecks, volumes and env defaults (S11).
+- [x] **1.8** `Makefile` with `up`, `down`, `logs`, `test`, `lint`, `lint-frontend` (S15).
+- [x] **1.9** Test `tests/core/test_health.py`: 200 with DB and Redis up; 503 when Redis is unreachable (patched).
+- [x] **1.10** Add the run, test and lint commands to `CLAUDE.md`.
 
 ### Verify
 

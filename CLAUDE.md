@@ -40,10 +40,18 @@ Read all three before any work. If they disagree, or something is not covered, a
 
 ## Commands
 
-Add each command here when it is created, with one line saying what it does.
+Add each command here when it is created, with one line saying what it does. Run them from the repository root.
 
-| Task | Command |
-| ---- | ------- |
-| Run  | _not created yet_ |
-| Test | _not created yet_ |
-| Lint | _not created yet_ |
+| Task | Command | What it does |
+| ---- | ------- | ------------ |
+| First setup | `cp -n .env.example .env` | Local env file (git-ignored) |
+| Run | `make up` (`docker compose up -d --build`) | Builds and starts postgres, redis, backend, worker, frontend |
+| Stop | `make down` | Stops the stack (data volumes kept) |
+| Logs | `make logs` | Follows backend and worker logs |
+| Health | `curl -fsS http://localhost:8000/api/health/` | Checks the DB and Redis through the API |
+| Test | `make test` (`docker compose exec -T backend pytest -q`) | Backend tests; needs the stack up |
+| Lint | `make lint` | `lint-backend` + `lint-frontend` |
+| Lint backend | `make lint-backend` | `ruff check .` and `ruff format --check .` in the backend container |
+| Lint frontend | `make lint-frontend` | ESLint + `tsc --noEmit` in a throwaway `node:22-alpine` container |
+
+URLs: frontend http://localhost:3000, API http://localhost:8000/api/.

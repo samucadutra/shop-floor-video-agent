@@ -1,0 +1,24 @@
+# Secrets
+.env
+
+# Data (never committed)
+media/
+samples/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+.venv/
+
+# Node / Next.js
+node_modules/
+.next/
+*.tsbuildinfo
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store

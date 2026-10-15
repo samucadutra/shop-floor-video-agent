@@ -31,7 +31,7 @@ def _compact(data: Any) -> str:
 
 
 def _reply_format(schema: type[BaseModel]) -> str:
-    return "Reply with JSON only, matching this JSON Schema:\n" + _compact(
+    return "Reply with a single JSON object (not a list), matching this JSON Schema:\n" + _compact(
         schema.model_json_schema()
     )
 

@@ -130,7 +130,9 @@ def survey(state: AgentState, deps: AgentDeps) -> dict[str, Any]:
             notes.append(result.scene_notes)
 
     candidates: list[CandidateState] = []
-    for c in raw:
+    # Latest sighting merged into each candidate, so a continuous event stays one candidate.
+    last_seen: dict[str, float] = {}
+    for c in sorted(raw, key=lambda c: c.time_s):
         label = f"{c.event_type} ~{c.time_s:.1f} s"
         if deps.event_type(c.event_type) is None:
             ignored.append(f"{label}: unknown event type")
@@ -143,13 +145,15 @@ def survey(state: AgentState, deps: AgentDeps) -> dict[str, Any]:
                 k
                 for k in candidates
                 if k["event_type"] == c.event_type
-                and abs(k["time_s"] - c.time_s) <= params.window_padding_s
+                and abs(last_seen[k["id"]] - c.time_s) <= params.window_padding_s
             ),
             None,
         )
         if same:
+            last_seen[same["id"]] = c.time_s
             ignored.append(f"{label}: same as {same['id']}")
             continue
+        last_seen[f"c{len(candidates) + 1}"] = c.time_s
         candidates.append(
             CandidateState(
                 id=f"c{len(candidates) + 1}",

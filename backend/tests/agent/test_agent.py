@@ -157,11 +157,27 @@ def test_full_run_saves_events_summary_and_trace(video: Video, analyze) -> None:
     assert steps[0].tool_calls[0]["tool"] == "get_frames"
 
     verify = next(s for s in steps if s.node == "verify")
-    assert "dropped c3 missing_ppe: The worker wears a hard hat." in verify.decision
+    assert "dropped c2 missing_ppe: The worker wears a hard hat." in verify.decision
 
     event = Event.objects.get(run=run, event_type="missing_ppe")
     assert event.frame_ref.startswith(f"frames/{run.id}/win_")
     assert event.frame_ref.endswith(".jpg")
+
+
+def test_continuous_sightings_become_one_candidate(video: Video, analyze, write_fixture) -> None:
+    # Sightings 2 s apart: each one is within WINDOW_PADDING_S of the previous one,
+    # but the last one is 4 s after the first.
+    ppe = TEST_FIXTURE["events"][0]
+    sightings = [ppe | {"time_s": t, "start_s": t - 1, "end_s": t + 1} for t in (1.0, 3.0, 5.0)]
+    write_fixture(events=[*sightings, TEST_FIXTURE["events"][1]], decoys=[])
+
+    run = analyze(video)
+
+    survey = _steps(run)[0]
+    assert survey.decision.startswith("2 candidate(s): missing_ppe ~1.0 s (c1)")
+    assert "missing_ppe ~3.0 s: same as c1" in survey.decision
+    assert "missing_ppe ~5.0 s: same as c1" in survey.decision
+    assert _events(run) == [("missing_ppe", 1.0), ("unsafe_proximity", 9.0)]
 
 
 def test_video_without_fixture_gets_generic_demo_events(make_test_video, analyze) -> None:

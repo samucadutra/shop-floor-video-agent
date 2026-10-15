@@ -319,11 +319,15 @@ sequenceDiagram
   default_severity: medium
 - key: unsafe_proximity
   label: Unsafe proximity
-  description: A person on foot within about 2 meters of moving machinery or a moving forklift.
+  description: >-
+    A person on foot within about 2 meters of machinery or a forklift that is moving at that
+    moment. The machine's own operator and parked or stationary machines do not count.
   default_severity: high
 - key: fallen_object_or_spill
   label: Fallen object or spill
-  description: An object dropped on the floor, or a liquid spill or wet floor in a work area.
+  description: >-
+    An object dropped on the floor, or a liquid spill or wet floor in a work area. Neatly
+    stacked or stored materials do not count.
   default_severity: medium
 ```
 
@@ -396,7 +400,7 @@ Each node writes exactly one `AgentStep` through `repository.record_step(...)`. 
 
 | Node      | LLM call | Behavior |
 | --------- | -------- | -------- |
-| `survey`  | yes, once per batch of `FRAMES_PER_CALL` frames, with images | `get_frames` in survey mode (S9: interval frames + scene frames, merged, frames closer than 1 s dropped). Survey may use at most 50% of `AGENT_MAX_FRAMES`; if it needs more, the interval is widened. Each batch returns a `SurveyResult`. Candidates get ids `c1…cN`; unknown `event_type` values are dropped and noted in the step. A failure after the retry **fails the run**. |
+| `survey`  | yes, once per batch of `FRAMES_PER_CALL` frames, with images | `get_frames` in survey mode (S9: interval frames + scene frames, merged, frames closer than 1 s dropped). Survey may use at most 50% of `AGENT_MAX_FRAMES`; if it needs more, the interval is widened. Each batch returns a `SurveyResult`. Candidates are sorted by time and get ids `c1…cN`. A sighting of the same type within `WINDOW_PADDING_S` of the latest sighting already merged into a candidate joins that candidate, so a continuous event stays one candidate. Unknown `event_type` values are dropped and noted in the step. A failure after the retry **fails the run**. |
 | `plan`    | **no** (deterministic) | Takes `open` candidates. Builds windows `[t − pad, t + pad]` with `pad = WINDOW_PADDING_S × (1 + looks)`, clamped to `[0, duration]`, and merges overlapping windows. Ranks them by the highest `default_severity` of their candidates, then by the number of candidates. Selects windows while `frames_used + (end − start) × INSPECT_FPS ≤ AGENT_MAX_FRAMES`. Builds a focused question per window from the event type descriptions and candidate reasons. Increments `iteration`. The decision text lists chosen and skipped windows with reasons. |
 | `inspect` | yes, one per window, with images | `get_frames(start, end, INSPECT_FPS)`, then `analyze_frames(frames, question)` returns an `InspectResult`. A failure after the retry drops the window's candidates (`status=dropped`, reason "analysis failed"), records the step as `error`, and the run continues. Increments `looks` on each candidate. |
 | `verify`  | yes, once per iteration, **text only** (observations, no images) | Returns a `VerifyResult`. `confirm` with `confidence ≥ CONFIDENCE_THRESHOLD` calls `save_event` and sets the candidate `confirmed`. `confirm` below the threshold, or `drop`, sets it `dropped` with a reason. `uncertain` keeps it `open`. A failure after the retry drops this iteration's candidates and the run continues. |
@@ -448,7 +452,7 @@ One builder per stage. Each prompt contains:
 2. The event type list (key + description).
 3. The frame list with timestamps (images are attached in the same order).
 4. The task for the stage.
-5. "Reply with JSON only, matching this JSON Schema:" followed by `Schema.model_json_schema()`.
+5. "Reply with a single JSON object (not a list), matching this JSON Schema:" followed by `Schema.model_json_schema()`. Some models answer with a bare list when there is only one item.
 
 The verify and report prompts include candidates and observations as compact JSON. Prompts never include file system paths or settings.
 

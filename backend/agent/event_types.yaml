@@ -5,9 +5,13 @@
   default_severity: medium
 - key: unsafe_proximity
   label: Unsafe proximity
-  description: A person on foot within about 2 meters of moving machinery or a moving forklift.
+  description: >-
+    A person on foot within about 2 meters of machinery or a forklift that is moving at that
+    moment. The machine's own operator and parked or stationary machines do not count.
   default_severity: high
 - key: fallen_object_or_spill
   label: Fallen object or spill
-  description: An object dropped on the floor, or a liquid spill or wet floor in a work area.
+  description: >-
+    An object dropped on the floor, or a liquid spill or wet floor in a work area. Neatly
+    stacked or stored materials do not count.
   default_severity: medium

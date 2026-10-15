@@ -42,7 +42,7 @@ The provider is chosen only by `LLM_PROVIDER` in `.env`. Restart the backend and
 **Free tier notes**
 
 - Limits are low (around 10 requests per minute plus a daily cap, depending on the model and project). See the AI Studio [rate limits page](https://ai.google.dev/gemini-api/docs/rate-limits). The agent throttles itself (`LLM_MAX_REQUESTS_PER_MINUTE=8`), sends up to 12 frames per call, makes at most 20 calls per run, and backs off on 429 and 5xx errors. A run on a 25 s clip takes a few minutes, mostly waiting for the throttle.
-- When the daily quota runs out, the run fails with a clear message. Switch to `mock` or try again the next day.
+- When the daily quota runs out, the run fails with a clear message. The quota is counted per model and can be as low as a few dozen requests a day, which is about one or two clips. Switch `GEMINI_MODEL` to another Flash model, switch to `mock`, or try again the next day. Popular models also return HTTP 503 at busy times; the agent retries with backoff.
 - Prices default to `0`, so the cost guardrail has no effect. Tokens are always tracked. Set `LLM_INPUT_PRICE_PER_MTOK` and `LLM_OUTPUT_PRICE_PER_MTOK` to see what a paid tier would cost.
 - Model names are never hardcoded. If `GEMINI_MODEL` stops working, pick a current Flash model from the AI Studio list.
 
@@ -160,8 +160,8 @@ To run the same checks locally, use `make lint` and `make test`. The actionlint 
 
 ## Limitations
 
-- **Accuracy.** A free tier vision model can miss events or flag false ones. Verify, the confidence threshold and the trace reduce that, but every event still needs a human check.
-- **Frame savings on very short clips.** The agent always surveys the whole clip and then inspects windows at 2 fps. On the 15–25 s samples it uses about 70% of the frames that a full 2 fps pass would need. On the 38 s clip it uses 49%. The savings grow with the clip length (see [docs/demo.md](docs/demo.md#results-on-the-sample-clips)).
+- **Accuracy.** A free tier vision model can miss events or flag false ones. On the 4 samples, Gemini found 3 of the 6 expected events and flagged 2 false ones (see [docs/demo.md](docs/demo.md#gemini-free-tier-2026-10-14)). Verify, the confidence threshold and the trace reduce errors, but every event still needs a human check.
+- **Frame savings on very short clips.** The agent always surveys the whole clip and then inspects windows at 2 fps. On the 15–25 s samples it uses roughly 65–80% of the frames a full 2 fps pass would need, and more when the model flags something every few seconds. The 38 s clip uses 36–49%. The savings grow with the clip length (see [docs/demo.md](docs/demo.md#results-on-the-sample-clips)).
 - **Mock realism.** The mock replays hand-written fixtures. It shows the full loop offline, but it does not look at the pixels.
 - **Throughput.** One worker runs one analysis at a time, which keeps the in-process throttle correct. Free tier runs take minutes.
 - **Scope.** No authentication, users or multi-tenancy. Only uploaded files (no live streams) are analyzed, and no alerts are sent. Media is stored on a local shared volume.

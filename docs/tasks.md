@@ -153,7 +153,7 @@ curl -fsS http://localhost:8000/api/videos/$VID/events/ | python3 -c 'import sys
 - [x] **5.3** Fail fast in the factory when the selected provider's env is missing (the message names the variable only).
 - [x] **5.4** Tests with a fake provider (no network): backoff on 429 and 503 (the wait patched to 0), no retry on 400, a quota error fails the run with a clear message, the throttle waits once over the limit (fake clock), cost math, and Gemini error mapping using fake SDK exceptions.
 - [x] **5.5** Update `.env.example` (`GEMINI_API_KEY`, `GEMINI_MODEL`, prices).
-- [ ] **5.6** Manual run with Gemini on sample 1, then compare the events with PRD Appendix A.
+- [ ] **5.6** Manual run with Gemini on sample 1, then compare the events with PRD Appendix A. **Open: sample 1 has been run several times (see `docs/demo.md`), but no completed run has found the missing hard hat yet. `gemini-3.8-flash` (2026-10-15) and `gemini-3.5-flash` (2026-10-19) saw it, then failed on HTTP 503; `gemini-3.5-flash-lite` misses it.**
 - [ ] **5.7** (optional) `agent/providers/anthropic.py` + tests with fake SDK errors.
 - [ ] **5.8** (optional) `agent/providers/openai.py` + tests with fake SDK errors.
 

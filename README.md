@@ -217,7 +217,16 @@ The videos are not committed. Four free clips from [Pexels](https://www.pexels.c
 | 3 | `13422071.mp4` | [Workers cleaning warehouse](https://www.pexels.com/video/workers-cleaning-warehouse-13422071/) (Rodrigo Garcin) | 15 s | `fallen_object_or_spill` ~0–3 s, low (wet floor being mopped) | `missing_ppe`: the workers wear hi-vis vests |
 | 4 | `31751344.mp4` | [Warehouse forklift moving through storage aisles](https://www.pexels.com/video/warehouse-forklift-moving-through-storage-aisles-31751344/) (Dominik Zítka) | 38 s | Control clip: `missing_ppe` ~6 s and ~30 s, low (driver without hard hat or vest) | `unsafe_proximity` when the forklift passes: no person on foot |
 
-SHA-256 hashes and direct download URLs: [PRD Appendix A](docs/prd.md#appendix-a-sample-videos). If a direct link stops working, `make samples` falls back to the Pexels download page, and the mock still matches the file by name.
+The mock fixtures are matched by these SHA-256 hashes (the exact 1280x720 files that `make samples` downloads):
+
+| # | File | SHA-256 |
+| - | ---- | ------- |
+| 1 | `16106604.mp4` | `e20b2a53363817e70a236b7139b48a6c85bd14ba822f8f741ab64500e2e55a75` |
+| 2 | `4294438.mp4` | `85f85ea690f98a8d920f9180d2538867fd4f1fa682857a28e834aa94f8e0639b` |
+| 3 | `13422071.mp4` | `aadaf12cddba076bf6a7acf31abea68f75b121f90a45cf7d9283fd1082819851` |
+| 4 | `31751344.mp4` | `2d4cc7eb91aa93361a0e1d756451452c073fcbd46a741e4e954aa4e1ddf5de18` |
+
+Direct download URLs: [PRD Appendix A](docs/prd.md#appendix-a-sample-videos). If a direct link stops working, `make samples` falls back to the Pexels download page, and the mock still matches the file by name.
 
 ## Limitations
 
